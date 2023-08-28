@@ -1,0 +1,48 @@
+.NavigationBar {
+
+  &__header {
+    justify-content: space-around;
+    display: flex;
+    background-color: #ea6424;
+    color: #efefef;
+    border-radius: 20px;
+    padding: 20px 20px 20px 20px;
+    top: 10px;
+
+    &__link {
+      &__active {
+        font-size: 17px;
+        text-align: center;
+        text-decoration: none;
+        background-color: #ffffff;
+        padding: 5px;
+        border-radius: 10px;
+        color: #ea6424;
+
+        &:hover{
+          background-color: #dadada;
+        }
+      }
+
+      &__pending {
+        font-size: 17px;
+        text-align: center;
+        text-decoration: none;
+        padding: 5px;
+        background-color:  #efefef;
+        border-radius: 10px;
+        color: #c4531e;
+
+        &:hover{
+          background-color: #dadada;
+        }
+      }
+    }
+
+    &__links {
+      justify-content: space-around;
+      display: flex;
+      width: 70%;
+    }
+  }
+}
