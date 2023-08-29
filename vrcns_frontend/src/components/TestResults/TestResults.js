@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {useSelector} from "react-redux"
 import "./TestResults.scss"
 import Modal from "../Modal/Modal";
+import Selector from "../UI/Selector/Selector";
 
 
 const TestResults = () => {
@@ -18,6 +19,7 @@ const TestResults = () => {
     const [title, setTitle] = useState("");
 
     const results = useSelector(state => state.testResults.testResultsTable);
+    const testOptions = useSelector(state => state.testResults.testOption);
 
     const handleClick = (name) => {
         setModal(true);
@@ -50,6 +52,11 @@ const TestResults = () => {
     </tbody>
 
     return (<div className={"TestResults"}>
+
+        <div className={"TestResults__settings-bar"}>
+            <Selector autoSelectedId={0} options={testOptions}/>
+        </div>
+
         <table className={"table"}>
             {tableHead}
             {tableBody}

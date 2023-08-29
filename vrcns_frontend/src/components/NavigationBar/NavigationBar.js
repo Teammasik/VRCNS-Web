@@ -15,9 +15,13 @@ const NavigationBar = ({type}) => {
     switch (type) {
         case "header":
             return (
-                <div style={{display: "flex", justifyContent: "center", textAlign:"center"}}>
+                <div style={{display: "flex", justifyContent: "center", textAlign: "center"}}>
                     <div className="NavigationBar__header" style={{width: "100%"}}>
-                        Меню
+                        <div style={{
+                            display: "flex", alignItems: "center",
+                            justifyContent: "center"
+                        }}>VR CNS
+                        </div>
                         <div className="NavigationBar__header__links">
                             {
                                 links.map(link => {

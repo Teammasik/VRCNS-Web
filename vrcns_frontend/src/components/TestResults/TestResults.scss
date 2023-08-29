@@ -1,5 +1,14 @@
 .TestResults {
 
+  &__settings-bar {
+    background-color: #ea6424;
+    border-radius: 20px;
+    margin-top: 10px;
+    padding: 20px 20px 20px 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
 }
 
 .table {
@@ -44,6 +53,8 @@
     }
 
     tr {
+      background: #efefef;
+
       &:nth-child(even) {
         background: #F8F8F8;
       }
