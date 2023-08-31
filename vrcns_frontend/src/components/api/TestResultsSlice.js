@@ -11,6 +11,11 @@ export const testResultsSlice = createSlice({
             {id: "test-1", name: "Тест-1"},
             {id: "test-2", name: "Тест-2"},
             {id: "test-3", name: "Тест-3"},
+        ],
+        testResultsBarChart: [
+            {name: "test-1", pass: 23, failed: 3},
+            {name: "test-2", pass: 21, failed: 5},
+            {name: "test-3", pass: 18, failed: 8},
         ]
     },
     reducers: {

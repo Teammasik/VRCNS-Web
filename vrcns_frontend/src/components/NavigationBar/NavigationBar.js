@@ -9,7 +9,7 @@ const NavigationBar = ({type}) => {
 
     const links = [
         {link: "/test-results", name: "Результаты тестирования"},
-        {link: "/graphs", name: "Инфографика"},
+        {link: "/charts", name: "Инфографика"},
     ];
 
     switch (type) {
