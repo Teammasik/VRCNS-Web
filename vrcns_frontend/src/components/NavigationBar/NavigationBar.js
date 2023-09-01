@@ -1,11 +1,8 @@
-import React, {useState} from "react";
+import React from "react";
 import {NavLink} from "react-router-dom";
 import "./NavigationBar.scss";
-import Input from "../UI/Input/Input";
 
 const NavigationBar = ({type}) => {
-
-    const [showBar, setShowBar] = useState(true);
 
     const links = [
         {link: "/test-results", name: "Результаты тестирования"},

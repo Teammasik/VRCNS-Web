@@ -16,11 +16,24 @@ export const testResultsSlice = createSlice({
             {name: "test-1", pass: 23, failed: 3},
             {name: "test-2", pass: 21, failed: 5},
             {name: "test-3", pass: 18, failed: 8},
-        ]
+        ],
+        selectedUserInfo: {
+            name: "",
+            surname: "",
+            data: [
+                {name: "pass", value: 12},
+                {name: "failed", value: 2}
+            ]
+        },
+        selectedTest: "",
+        selectedUserId: ""
     },
     reducers: {
         setTestResults: (state, action) => {
             state.testResults = action.payload;
+        },
+        setSelectedTest: (state, action) => {
+            state.selectedTest = action.payload;
         }
     }
 })

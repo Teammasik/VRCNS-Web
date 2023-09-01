@@ -3,6 +3,7 @@ import {useSelector} from "react-redux"
 import "./TestResults.scss"
 import Modal from "../Modal/Modal";
 import Selector from "../UI/Selector/Selector";
+import {Cell, Legend, Pie, PieChart} from "recharts";
 
 
 const TestResults = () => {
@@ -20,6 +21,7 @@ const TestResults = () => {
 
     const results = useSelector(state => state.testResults.testResultsTable);
     const testOptions = useSelector(state => state.testResults.testOption);
+    const selectedUserInfo = useSelector(state => state.testResults.selectedUserInfo);
 
     const handleClick = (name) => {
         setModal(true);
@@ -51,21 +53,32 @@ const TestResults = () => {
     }
     </tbody>
 
-    return (<div className={"TestResults"}>
-
-        <div className={"TestResults__settings-bar"}>
-            <Selector autoSelectedId={0} options={testOptions}/>
+    const userInfo = <div
+        style={{display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center"}}>
+        <div>
+            Результаты тестирования студента
         </div>
+        <PieChart width={730} height={250}>
+            <Legend/>
+            <Pie nameKey={"results"} data={selectedUserInfo.data} dataKey={"value"} label>
+                <Cell fill={"#82ca9d"}/>
+                <Cell fill={"#e71c3b"}/>
+            </Pie>
+        </PieChart>
+    </div>
 
-        <table className={"table"}>
-            {tableHead}
-            {tableBody}
-        </table>
-
-        {
-            isOpenModal && <Modal title={title} children={"123333"} onClose={() => setModal(false)}/>
-        }
-    </div>);
+    return (
+        <div className={"TestResults"}>
+            <div className={"TestResults__settings-bar"}>
+                <Selector autoSelectedId={0} options={testOptions}/>
+            </div>
+            <table className={"table"}>
+                {tableHead}
+                {tableBody}
+            </table>
+            {isOpenModal && <Modal title={title} children={userInfo} onClose={() => setModal(false)}/>}
+        </div>
+    );
 }
 
 export default TestResults;
