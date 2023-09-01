@@ -6,6 +6,8 @@ export const testResultsSlice = createSlice({
         testResultsTable: [
             {id: 1, name: "Олег", surname: "Щербаков", group: "БПОи", mark: '1'},
             {id: 2, name: "Роберт", surname: "Селимов", group: "К3-51Б", mark: '1'},
+            {id: 3, name: "Роберт", surname: "Селимов", group: "К3-51Б", mark: '1'},
+            {id: 4, name: "Роберт", surname: "Селимов", group: "К3-51Б", mark: '1'},
         ],
         testOption: [
             {id: "test-1", name: "Тест-1"},

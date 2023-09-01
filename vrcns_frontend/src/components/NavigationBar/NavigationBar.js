@@ -16,7 +16,8 @@ const NavigationBar = ({type}) => {
                     <div className="NavigationBar__header" style={{width: "100%"}}>
                         <div style={{
                             display: "flex", alignItems: "center",
-                            justifyContent: "center"
+                            justifyContent: "center", fontFamily: '"Gill Sans", sans-serif',
+                            fontSize: "17px", fontWeight: "bold"
                         }}>VR CNS
                         </div>
                         <div className="NavigationBar__header__links">

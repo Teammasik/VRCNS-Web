@@ -8,6 +8,27 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
+
+    &__button {
+      background-color: white;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 10px;
+      font-family: "Gill Sans", sans-serif;
+      font-size: 17px;
+
+      &:hover {
+        background-color: #dedede;;
+      }
+
+      &:active {
+        background-color: #c5c5c5;;
+      }
+    }
+
   }
 }
 
@@ -50,13 +71,24 @@
       padding: 10px 15px;
       font-size: 14px;
       vertical-align: top;
+
+
     }
 
     tr {
+
+      &:hover {
+        background-color: #dedede;;
+      }
+
       background: #efefef;
 
       &:nth-child(even) {
         background: #F8F8F8;
+
+        &:hover {
+          background-color: #dedede;;
+        }
       }
 
       &:last-child {

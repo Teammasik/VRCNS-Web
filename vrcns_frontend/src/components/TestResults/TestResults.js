@@ -4,6 +4,7 @@ import "./TestResults.scss"
 import Modal from "../Modal/Modal";
 import Selector from "../UI/Selector/Selector";
 import {Cell, Legend, Pie, PieChart} from "recharts";
+import Icons from "../Icons/Icons";
 
 
 const TestResults = () => {
@@ -60,7 +61,7 @@ const TestResults = () => {
         </div>
         <PieChart width={730} height={250}>
             <Legend/>
-            <Pie nameKey={"results"} data={selectedUserInfo.data} dataKey={"value"} label>
+            <Pie nameKey={"results"} data={selectedUserInfo.data} dataKey={"value"} label animationDuration={1000}>
                 <Cell fill={"#82ca9d"}/>
                 <Cell fill={"#e71c3b"}/>
             </Pie>
@@ -71,6 +72,11 @@ const TestResults = () => {
         <div className={"TestResults"}>
             <div className={"TestResults__settings-bar"}>
                 <Selector autoSelectedId={0} options={testOptions}/>
+
+                <button className="TestResults__settings-bar__button">
+                    Скачать в Excel
+                    <Icons type={"download-png"} width={25} height={25}/>
+                </button>
             </div>
             <table className={"table"}>
                 {tableHead}
