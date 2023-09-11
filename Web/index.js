@@ -1,15 +1,14 @@
 
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+
+
+import {PORT} from "./connection.js";
+import {conn} from "./connection.js";
+
+
 const app = require('express')();
-const PORT = 8080;
 const mysql = require('mysql');
-
-
-const conn = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    database: "unityaccess",
-    password: "root"
-});
 
 
 conn.connect(err=>{
