@@ -2,8 +2,20 @@
   background: white;
   border-radius: 20px;
   margin-top: 10px;
-  padding: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+
+  &__modal {
+    &__header {
+      border-radius: 20px 20px 0 0;
+      background-color: #ea6424;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 15px 5px 15px;
+    }
+
+    &__body {
+      display: flex;
+      justify-content: space-evenly;
+    }
+  }
 }

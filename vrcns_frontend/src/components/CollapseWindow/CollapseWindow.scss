@@ -1,0 +1,35 @@
+.CollapseWindow {
+  background: white;
+  border-radius: 20px;
+  margin-top: 10px;
+
+  &__header-opened {
+    border-radius: 20px 20px 0 0;
+    background-color: #ea6424;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 15px 5px 15px;
+  }
+
+  &__header-closed {
+    align-items: center;
+    border-radius: 20px;
+    background-color: #ea6424;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 15px 5px 15px;
+  }
+
+  &__body-opened {
+    display: flex;
+    justify-content: space-evenly;
+  }
+
+  &__body-closed {
+    height: 0;
+    overflow: hidden;
+  }
+}
