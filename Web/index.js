@@ -78,10 +78,6 @@ app.get('/attempts', (req, res) => {
         for (let i = 0; i < result.length; i++) {
             marks.push(result[i].attempts);
           }
-        
-        for (let i = 0; i < studs.length; i++) {
-            
-        }
 
 
         var dict1 = {
@@ -104,7 +100,9 @@ app.get('/fetchbyid/:id', (req, res) => {
     });
 });
 
-// здесь нужно прописывать либо assembly либо disassembly, e.g: testResults/assembly
+
+// здесь нужно прописывать либо assembly либо disassembly, e.g: testResults/assembly (outdated)
+// теперь пишем айдишник
 app.get('/testResults/:test', (req, res) => { 
     const fetchid=req.params.test;
     conn.query("SELECT id, username, usersurname, usergroup, mark FROM `students` where test = ?", fetchid,(err, result) =>{
@@ -137,6 +135,7 @@ app.get('/testScore/:test', (req, res) => {
 
 
 // to fix: при округлении может получится так, что процентов будет 101
+// важно упомянуть, что я отправляю инты, а не проценты, но думаю это не проблема
 app.get('/testPercentResult/:test', (req, res) => {
     const fetchid=req.params.test;
     var summ
@@ -163,7 +162,7 @@ app.get('/testPercentResult/:test', (req, res) => {
 
 
 app.get('/testList', (req, res) => {
-    let query2 = "SELECT DISTINCT test FROM `students` where test is not null"
+    let query2 = "SELECT test FROM `tests`"
     conn.query(query2, (err, result) =>{
         res.status(200).send({
             result
