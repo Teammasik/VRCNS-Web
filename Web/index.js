@@ -7,8 +7,13 @@ import {PORT} from "./connection.js";
 import {conn} from "./connection.js";
 
 
-const app = require('express')();
+const express = require('express');
 const mysql = require('mysql');
+
+const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({extended: true}))
 
 
 conn.connect(err=>{
@@ -20,6 +25,25 @@ conn.connect(err=>{
         console.log('Db is ok')
     }
 });
+
+// example of json file
+// let s = {
+//     "name": "custom",
+//     "surname": "asswe",
+//     "group": "none",
+//     "mark": 1,
+//     "udate": "2023-06-22",
+//     "points": 22,
+//     "test": 1
+//   }
+
+
+app.post('/sendData', (req,res) => {
+    let query1 = "insert into students(username,usersurname, usergroup, mark, udate, points, test) VALUES (?,?,?,?,?,?,?)";
+    conn.query(query1, [req.body.name, req.body.surname,req.body.group,req.body.mark,req.body.udate,req.body.points,req.body.test] ,(err, result) =>{
+        res.send(req.body);
+    });
+})
 
 
 app.get('/data', (req, res) =>{
