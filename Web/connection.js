@@ -10,5 +10,5 @@ export const conn = mysql.createConnection({
     host: "localhost",
     user: "root",
     database: "unityaccess",
-    password: "root"
+    password: "root",
 });

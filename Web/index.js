@@ -14,6 +14,14 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
+const cors = require("cors")
+
+
+app.use(
+    cors({
+        origin: "*",
+    })
+)
 
 
 conn.connect(err=>{
@@ -132,8 +140,10 @@ app.get('/testResults/:test', (req, res) => {
         res.status(200).send({result})
     });
 });
+//http://217.18.60.195:8080/testResults/1
 
 // тут то же самое
+// http://217.18.60.195:8080/testScore/1
 app.get('/testScore/:test', (req, res) => {
     const fetchid=req.params.test;
     conn.query('SELECT DISTINCT COUNT(username) as pnts FROM `students` WHERE points<11 and test = ?', fetchid,(err, result) =>{
@@ -159,6 +169,8 @@ app.get('/testScore/:test', (req, res) => {
 
 // to fix: при округлении может получится так, что процентов будет 101
 // важно упомянуть, что я отправляю инты, а не проценты, но думаю это не проблема
+// http://217.18.60.195:8080/testPercentResult/1
+
 app.get('/testPercentResult/:test', (req, res) => {
     const fetchid=req.params.test;
     var summ
@@ -183,9 +195,9 @@ app.get('/testPercentResult/:test', (req, res) => {
     });
 });
 
-
+// http://217.18.60.195:8080/testList
 app.get('/testList', (req, res) => {
-    let query2 = "SELECT test FROM `tests`"
+    let query2 = "SELECT id, test FROM `tests`"
     conn.query(query2, (err, result) =>{
         res.status(200).send({
             result
