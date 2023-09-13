@@ -1,6 +1,6 @@
 
 import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+const require = createRequire(import.meta.url); // those two rows make "require" work simultaneously with "import"
 
 
 import {PORT} from "./connection.js";
@@ -8,15 +8,12 @@ import {conn} from "./connection.js";
 
 
 const express = require('express');
-const mysql = require('mysql');
-
 const app = express();
-
 app.use(express.json());
-app.use(express.urlencoded({extended: true}))
-const cors = require("cors")
+app.use(express.urlencoded({extended: true})) // not sure what this thing does, but let it be there
 
 
+const cors = require("cors");
 app.use(
     cors({
         origin: "*",
@@ -34,8 +31,9 @@ conn.connect(err=>{
     }
 });
 
+
 // example of json file
-// let s = {
+//  {
 //     "name": "custom",
 //     "surname": "asswe",
 //     "group": "none",
@@ -46,14 +44,17 @@ conn.connect(err=>{
 //   }
 
 
+// http://217.18.60.195:8080/sendData
 app.post('/sendData', (req,res) => {
-    let query1 = "insert into students(username,usersurname, usergroup, mark, udate, points, test) VALUES (?,?,?,?,?,?,?)";
+    let query1 = "insert into students(userName,userSurname, userGroup, mark, uDate, points, test) VALUES (?,?,?,?,?,?,?)";
     conn.query(query1, [req.body.name, req.body.surname,req.body.group,req.body.mark,req.body.udate,req.body.points,req.body.test] ,(err, result) =>{
         res.send(req.body);
     });
 })
 
 
+// method gets everything from main table
+// http://217.18.60.195:8080/tshirt
 app.get('/data', (req, res) =>{
     let query1 = "SELECT * FROM `students`";
     conn.query(query1, (err, result) =>{
@@ -65,6 +66,7 @@ app.get('/data', (req, res) =>{
 });
 
 
+// crutch, kinda useless request, had to get rid of conn.end() func, still trying to find way to make it properly
 app.get('/stop', (req, res) =>{
     conn.end(err=>{
         if (err){
@@ -79,6 +81,7 @@ app.get('/stop', (req, res) =>{
 })
 
 
+// http://217.18.60.195:8080/tshirt
 app.get('/tshirt', (req, res) => {
     res.status(200).send({
         tshirt: 'ss',
@@ -87,18 +90,22 @@ app.get('/tshirt', (req, res) => {
 });
 
 
+// http://217.18.60.195:8080/points
 app.get('/points', (req, res) => {
-    let query2 = "SELECT DISTINCT COUNT(username) as pnts FROM `students` WHERE points<11 UNION SELECT DISTINCT COUNT(username) FROM `students` WHERE points<16 UNION SELECT DISTINCT COUNT(username) FROM `students` WHERE points<21 UNION SELECT DISTINCT COUNT(username) FROM `students` WHERE points<26"
+    let query2 = "SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 UNION SELECT DISTINCT COUNT(userName) FROM `students` WHERE points<16 UNION SELECT DISTINCT COUNT(userName) FROM `students` WHERE points<21 UNION SELECT DISTINCT COUNT(userName) FROM `students` WHERE points<26"
     conn.query(query2, (err, result) =>{
         res.status(200).send({
             result
         })
+        console.log("request points completed successfully")
     });
 });
 
 
+// http://217.18.60.195:8080/attempts
+// delete in final build
 app.get('/attempts', (req, res) => {
-    let query3 = "SELECT COUNT(*) as students, amount as attempts FROM (SELECT count(*) as amount FROM `students`GROUP by username) as sss GROUP BY amount"
+    let query3 = "SELECT COUNT(*) as students, amount as attempts FROM (SELECT count(*) as amount FROM `students`GROUP by userName) as sss GROUP BY amount"
     conn.query(query3, (err, result) =>{
         let studs = new Array;
         let marks = new Array;
@@ -124,32 +131,33 @@ app.get('/attempts', (req, res) => {
 });
 
 
-app.get('/fetchbyid/:id', (req, res) => {
+// http://217.18.60.195:8080/fetchbyid/1
+app.get('/fetchById/:id', (req, res) => {
     const fetchid=req.params.id;
-    conn.query('select id, username, usersurname, usergroup from `students` where id=?', fetchid,(err, result) =>{
+    conn.query('select id, userName, userSurname, userGroup from `students` where id=?', fetchid,(err, result) =>{
         res.status(200).send({result})
+        console.log("request fetchById completed successfully")
     });
 });
 
 
-// здесь нужно прописывать либо assembly либо disassembly, e.g: testResults/assembly (outdated)
-// теперь пишем айдишник
+// http://217.18.60.195:8080/testResults/1
 app.get('/testResults/:test', (req, res) => { 
     const fetchid=req.params.test;
-    conn.query("SELECT id, username, usersurname, usergroup, mark FROM `students` where test = ?", fetchid,(err, result) =>{
+    conn.query("SELECT id, userName, userSurname, userGroup, mark FROM `students` where test = ?", fetchid,(err, result) =>{
         res.status(200).send({result})
+        console.log("request testResults completed successfully")
     });
 });
-//http://217.18.60.195:8080/testResults/1
 
-// тут то же самое
+
 // http://217.18.60.195:8080/testScore/1
 app.get('/testScore/:test', (req, res) => {
     const fetchid=req.params.test;
-    conn.query('SELECT DISTINCT COUNT(username) as pnts FROM `students` WHERE points<11 and test = ?', fetchid,(err, result) =>{
-        conn.query('SELECT DISTINCT COUNT(username) as pnts FROM `students` WHERE points<16 and points>10 and test = ?', fetchid,(err, result1) =>{
-            conn.query('SELECT DISTINCT COUNT(username) as pnts FROM `students` WHERE points<21 and points>15 and test = ?', fetchid,(err, result2) =>{
-                conn.query('SELECT DISTINCT COUNT(username) as pnts FROM `students` WHERE points<26 and points>20 and test = ?', fetchid,(err, result3) =>{
+    conn.query('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = ?', fetchid,(err, result) =>{
+        conn.query('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<16 and points>10 and test = ?', fetchid,(err, result1) =>{
+            conn.query('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<21 and points>15 and test = ?', fetchid,(err, result2) =>{
+                conn.query('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = ?', fetchid,(err, result3) =>{
                     var answer = {
                         test: fetchid,
                         data: {
@@ -160,6 +168,7 @@ app.get('/testScore/:test', (req, res) => {
                         }
                     }
                     res.status(200).send({answer})
+                    console.log("request testScore completed successfully")
                 });
             });
         });
@@ -167,17 +176,14 @@ app.get('/testScore/:test', (req, res) => {
 });
 
 
-// to fix: при округлении может получится так, что процентов будет 101
-// важно упомянуть, что я отправляю инты, а не проценты, но думаю это не проблема
 // http://217.18.60.195:8080/testPercentResult/1
-
 app.get('/testPercentResult/:test', (req, res) => {
     const fetchid=req.params.test;
     var summ
-    conn.query('SELECT DISTINCT COUNT(username) as pnts FROM `students` WHERE points<11 and test = ?', fetchid,(err, result) =>{
-        conn.query('SELECT DISTINCT COUNT(username) as pnts FROM `students` WHERE points<16 and points>10 and test = ?', fetchid,(err, result1) =>{
-            conn.query('SELECT DISTINCT COUNT(username) as pnts FROM `students` WHERE points<21 and points>15 and test = ?', fetchid,(err, result2) =>{
-                conn.query('SELECT DISTINCT COUNT(username) as pnts FROM `students` WHERE points<26 and points>20 and test = ?', fetchid,(err, result3) =>{
+    conn.query('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = ?', fetchid,(err, result) =>{
+        conn.query('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<16 and points>10 and test = ?', fetchid,(err, result1) =>{
+            conn.query('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<21 and points>15 and test = ?', fetchid,(err, result2) =>{
+                conn.query('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = ?', fetchid,(err, result3) =>{
                     summ = result[0].pnts + result1[0].pnts + result2[0].pnts + result3[0].pnts
                     var answer = {
                         test: fetchid,
@@ -189,11 +195,13 @@ app.get('/testPercentResult/:test', (req, res) => {
                         }
                     }
                     res.status(200).send({answer})
+                    console.log("request testPercentResult completed successfully")
                 });
             });
         });
     });
 });
+
 
 // http://217.18.60.195:8080/testList
 app.get('/testList', (req, res) => {
@@ -202,6 +210,7 @@ app.get('/testList', (req, res) => {
         res.status(200).send({
             result
         })
+        console.log("request testList completed successfully")
     });
 });
 
@@ -210,4 +219,3 @@ app.listen(
     PORT,
     () => console.log(`it works on http://localhost:${PORT}`)
 );
-
