@@ -10,6 +10,7 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true})) // not sure what this thing does, but let it be there
+const excelJs = require("exceljs");
 
 
 const cors = require("cors");
@@ -30,6 +31,62 @@ app.use(
 //     "points": 22,
 //     "test": 1
 //   }
+
+
+// http://217.18.60.195:8080/export
+app.get('/export', (req, res)=>{
+    try{
+        let workbook = new excelJs.Workbook()
+        const sheet = workbook.addWorksheet("students")
+        sheet.columns = [
+            {header: "id", key: "id", width: 25},
+            {header: "userName", key: "userName", width: 25},
+            {header: "userSurname", key: "userSurname", width: 25},
+            {header: "userGroup", key: "userGroup", width: 25},
+            {header: "mark", key: "mark", width: 25},
+            {header: "uDate", key: "uDate", width: 25},
+            {header: "points", key: "points", width: 25},
+            {header: "test", key: "test", width: 25},
+        ]
+
+
+        pool.execute("SELECT * FROM `students`")
+        .then(result =>{
+            result = result[0];
+            result.forEach(item => {
+                sheet.addRow({
+                    id: item.id,
+                    userName: item.userName,
+                    userSurname: item.userSurname,
+                    userGroup: item.userGroup,
+                    mark: item.mark,
+                    uDate: item.uDate,
+                    points: item.points,
+                    test: item.test
+                })
+            });
+
+            //this thing is for correct formats and name
+            var today = new Date();
+            const now = today.toLocaleString('ru-RU', { year: 'numeric', month: 'numeric', day: 'numeric' });
+            res.setHeader(
+                "Content-Type",
+                "application/vnd.opemxmlformats-officedocument.spreadsheetml.sheet"
+            );
+            res.setHeader(
+                "Content-Disposition",
+                "attachment;filename=" + "students_" + now.toString() + ".xlsx"
+            );
+
+            workbook.xlsx.write(res);
+            res.status(200);
+            console.log("succesfully created xlsx file!");
+        })
+
+    } catch(error){
+        console.log(error);
+    }
+})
 
 
 // http://217.18.60.195:8080/sendData
