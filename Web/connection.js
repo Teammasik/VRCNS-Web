@@ -2,15 +2,16 @@ import { createRequire } from "module";
 
 
 const require = createRequire(import.meta.url);
-export const mysql = require('mysql');
+//export const mysql = require('mysql');
 export let PORT = 8080;
 
 
-export function get_connection(){
-    return mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        database: "unityaccess",
-        password: "root",
-    })
-}
+export const mysql = require("mysql2");
+  
+export const pool = mysql.createPool({
+  connectionLimit: 5,
+  host: "localhost",
+  user: "root",
+  database: "unityaccess",
+  password: "root"
+}).promise();
