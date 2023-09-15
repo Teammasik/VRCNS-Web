@@ -2,7 +2,7 @@
 
   &__header {
     background-color: white;
-    width: 120px;
+    width: 220px;
     height: 30px;
     display: flex;
     align-items: center;
@@ -19,19 +19,20 @@
   &__body {
     margin-top: 5px;
     background-color: white;
-    width: 120px;
+    width: 220px;
+
     text-align: center;
     border-radius: 10px;
     position: absolute;
   }
 
   &__option {
-    height: 30px;
-    background: #efefef;
+    min-height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-
+    min-width: 120px;
+    padding: 0 10px 0 10px;
     &:nth-child(even) {
       background: #F8F8F8;
     }
@@ -42,6 +43,10 @@
 
     &:last-child {
       border-radius: 0 0 10px 10px;
+    }
+
+    &:only-child{
+      border-radius:  10px;
     }
 
     &:hover {

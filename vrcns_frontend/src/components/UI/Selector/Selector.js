@@ -1,15 +1,18 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "./Selector.scss"
 
-const Selector = ({options = [], autoSelectedId = 0}) => {
+const Selector = ({options = [], saveId, handleSelect, name}) => {
 
-    const [selectedValue, setSelectedValue] = useState(options[autoSelectedId].name || "");
-    const [selectedId, setSelectedId] = useState(options[autoSelectedId].id || "")
+    const [selectedValue, setSelectedValue] = useState("");
     const [isOpenSelector, setSelector] = useState(false);
 
-    const handleOptionClick = (el) => {
-        setSelectedValue(el.name);
-        setSelectedId(el.id);
+    useEffect(() => {
+        setSelectedValue(options[0]?.[name]);
+    }, [options[0]?.[name]]);
+
+    const handleOptionClick = (e) => {
+        handleSelect(e.id);
+        setSelectedValue(e[name]);
         setSelector(false)
     };
 
@@ -18,10 +21,10 @@ const Selector = ({options = [], autoSelectedId = 0}) => {
         {
             isOpenSelector && <div className="Selector__body">
                 {
-                    options.map(el => {
-                        if (el.name !== selectedValue)
-                            return <div onClick={() => handleOptionClick(el)} className={"Selector__option"}
-                                        key={el.id + "_option"}>{el.name}</div>
+                    options.map(e => {
+                        if (saveId !== e.id)
+                            return <div onClick={() => handleOptionClick(e)} className={"Selector__option"}
+                                        key={e.id + "_option"}>{e[name]}</div>
                     })
                 }
             </div>

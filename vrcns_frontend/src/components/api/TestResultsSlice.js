@@ -1,19 +1,52 @@
-import {createSlice} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+
+export const fetchResultTable = createAsyncThunk(
+    'results/resultTable',
+    async (arg, thunkAPI) => {
+        try {
+            const response = await fetch(`http://217.18.60.195:8080/testResults/${arg.id}`)
+                .then(response => response.json())
+
+            return response.result;
+        } catch (error) {
+            console.log(error)
+        }
+    }
+);
+
+export const fetchTestPercentResult= createAsyncThunk(
+    'results/resultTable',
+    async (arg, thunkAPI) => {
+        try {
+            const response = await fetch(`http://217.18.60.195:8080/testPercentResult/${arg.id}`)
+                .then(response => response.json())
+
+            return response.answer;
+        } catch (error) {
+            console.log(error)
+        }
+    }
+);
+
+export const fetchTestList = createAsyncThunk(
+    'results/testList',
+    async (arg, thunkAPI) => {
+        try {
+            const response = await fetch("http://217.18.60.195:8080/testList")
+                .then(response => response.json())
+
+            return response.result;
+        } catch (error) {
+            console.log(error)
+        }
+    }
+);
 
 export const testResultsSlice = createSlice({
     name: "testResults",
     initialState: {
-        testResultsTable: [
-            {id: 1, name: "Олег", surname: "Щербаков", group: "БПОи", mark: '1'},
-            {id: 2, name: "Роберт", surname: "Селимов", group: "К3-51Б", mark: '1'},
-            {id: 3, name: "Тимур", surname: "Терегулов", group: "К3-52Б", mark: '1'},
-            {id: 4, name: "Александр", surname: "Турбин", group: "К3-51Б", mark: '0'},
-        ],
-        testOption: [
-            {id: "test-1", name: "Тест-1"},
-            {id: "test-2", name: "Тест-2"},
-            {id: "test-3", name: "Тест-3"},
-        ],
+        testResultsTable: [],
+        testOption: [],
         selectedUserInfo: {
             name: "",
             surname: "",
@@ -53,16 +86,45 @@ export const testResultsSlice = createSlice({
                 {name: "21-25", value: 1},
             ]
         }],
-        selectedTest: "",
-        selectedUserId: ""
+        testPercentResults:[],
+        selectedTest: 1,
+        selectedUserId: "",
+
+        isLoading: false,
+        error: false
     },
     reducers: {
-        setTestResults: (state, action) => {
-            state.testResults = action.payload;
-        },
         setSelectedTest: (state, action) => {
             state.selectedTest = action.payload;
         }
+    },
+    extraReducers: {
+        [fetchResultTable.pending]: state => {
+            state.isLoading = true;
+            state.error = "";
+        },
+        [fetchResultTable.fulfilled]: (state, action) => {
+            state.isLoading = false;
+            state.testResultsTable = action.payload;
+        },
+        [fetchResultTable.rejected]: state => {
+            state.isLoading = false;
+            state.error = {message: "Ошибка получения списка результатов"};
+            state.testResultsTable = [];
+        },
+        [fetchTestList.pending]: state => {
+            state.isLoading = true;
+            state.error = "";
+        },
+        [fetchTestList.fulfilled]: (state, action) => {
+            state.isLoading = false;
+            state.testOption = action.payload;
+        },
+        [fetchTestList.rejected]: state => {
+            state.isLoading = false;
+            state.error = {message: "Ошибка получения списка тестов"};
+            state.testResultsTable = [];
+        },
     }
 })
 

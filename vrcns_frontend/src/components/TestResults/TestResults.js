@@ -1,21 +1,26 @@
-import React, {useState} from "react";
-import {useSelector} from "react-redux"
+import React, {useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux"
 import "./TestResults.scss"
 import Modal from "../Modal/Modal";
 import Selector from "../UI/Selector/Selector";
 import {Cell, Legend, Pie, PieChart} from "recharts";
 import Icons from "../Icons/Icons";
+import {fetchResultTable, fetchTestList, testResultsActions} from "../api/TestResultsSlice";
 
 
 const TestResults = () => {
 
+    const dispatch = useDispatch();
+
     const tableMapper = [
         {key: "item", name: "№"},
-        {key: "name", name: "Имя"},
-        {key: "surname", name: "Фамилия"},
-        {key: "group", name: "Группа"},
+        {key: "userName", name: "Имя"},
+        {key: "userSurname", name: "Фамилия"},
+        {key: "userGroup", name: "Группа"},
         {key: "mark", name: "Оценка"},
     ]
+
+    const selectedTestId = useSelector(state => state.testResults.selectedTest)
 
     const [isOpenModal, setModal] = useState(false);
     const [title, setTitle] = useState("");
@@ -24,9 +29,22 @@ const TestResults = () => {
     const testOptions = useSelector(state => state.testResults.testOption);
     const selectedUserInfo = useSelector(state => state.testResults.selectedUserInfo);
 
+    useEffect(() => {
+        dispatch(fetchResultTable({id: selectedTestId}));
+    }, [selectedTestId]);
+
+    useEffect(() => {
+        dispatch(fetchTestList());
+
+    }, []);
+
     const handleClick = (name) => {
         setModal(true);
         setTitle(name)
+    }
+
+    const handleSelectTestId = (e) => {
+        dispatch(testResultsActions.setSelectedTest(e));
     }
 
     const tableHead = <thead>
@@ -71,7 +89,8 @@ const TestResults = () => {
     return (
         <div className={"TestResults"}>
             <div className={"TestResults__settings-bar"}>
-                <Selector autoSelectedId={0} options={testOptions}/>
+                <Selector options={testOptions} handleSelect={handleSelectTestId}
+                          name={"test"} saveId={selectedTestId}/>
 
                 <button className="TestResults__settings-bar__button">
                     Скачать в Excel
