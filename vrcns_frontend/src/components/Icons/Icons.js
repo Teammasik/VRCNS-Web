@@ -19,7 +19,7 @@ const Icons = ({type, width = 10, height = 10}) => {
                 </g>
             </svg>
         case "download-png":
-            return <div >
+            return <div style={{width: width, height: height}}>
                 <img src={downloadPng} alt={"-"} style={{width: width, height: height}}/>
             </div>
         default:
