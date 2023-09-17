@@ -39,23 +39,27 @@ app.get('/export', (req, res)=>{
         let workbook = new excelJs.Workbook()
         const sheet = workbook.addWorksheet("students")
         sheet.columns = [
-            {header: "id", key: "id", width: 25},
-            {header: "userName", key: "userName", width: 25},
-            {header: "userSurname", key: "userSurname", width: 25},
-            {header: "userGroup", key: "userGroup", width: 25},
-            {header: "mark", key: "mark", width: 25},
-            {header: "uDate", key: "uDate", width: 25},
-            {header: "points", key: "points", width: 25},
-            {header: "test", key: "test", width: 25},
+            {header: "Имя", key: "userName", width: 15},
+            {header: "Фамилия", key: "userSurname", width: 15},
+            {header: "Группа", key: "userGroup", width: 15},
+            {header: "Оценка", key: "mark", width: 15},
+            {header: "Дата", key: "uDate", width: 15},
+            {header: "Очки", key: "points", width: 15},
+            {header: "Тип", key: "test", width: 15},
         ]
 
 
-        pool.execute("SELECT * FROM `students`")
+        pool.execute("SELECT userName, userSurname, userGroup, mark, uDate, points, tests.test FROM `students`, `tests` WHERE tests.id = students.test")
         .then(result =>{
             result = result[0];
             result.forEach(item => {
+                if (item.mark == 1){
+                    item.mark = "Зачет"
+                }
+                else{
+                    item.mark = "Незачёт"
+                }
                 sheet.addRow({
-                    id: item.id,
                     userName: item.userName,
                     userSurname: item.userSurname,
                     userGroup: item.userGroup,
@@ -66,7 +70,7 @@ app.get('/export', (req, res)=>{
                 })
             });
 
-            //this thing is for correct formats and name
+            //this thing is for correct formats and name of xls file
             var today = new Date();
             const now = today.toLocaleString('ru-RU', { year: 'numeric', month: 'numeric', day: 'numeric' });
             res.setHeader(
