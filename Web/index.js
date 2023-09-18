@@ -34,8 +34,9 @@ app.use(
 
 
 // http://217.18.60.195:8080/export
-app.get('/export', (req, res)=>{
+app.get('/export/:id', (req, res)=>{
     try{
+        const fetchid = req.params.id;
         let workbook = new excelJs.Workbook()
         const sheet = workbook.addWorksheet("students")
         sheet.columns = [
@@ -49,7 +50,7 @@ app.get('/export', (req, res)=>{
         ]
 
 
-        pool.execute("SELECT userName, userSurname, userGroup, mark, uDate, points, tests.test FROM `students`, `tests` WHERE tests.id = students.test")
+        pool.execute("SELECT userName, userSurname, userGroup, mark, uDate, points, tests.test FROM `students`, `tests` WHERE tests.id = students.test and students.test = ?",[fetchid])
         .then(result =>{
             result = result[0];
             result.forEach(item => {
