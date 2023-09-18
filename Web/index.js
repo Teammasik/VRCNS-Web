@@ -33,7 +33,7 @@ app.use(
 //   }
 
 
-// http://217.18.60.195:8080/export
+// http://217.18.60.195:8080/export/1
 app.get('/export/:id', (req, res)=>{
     try{
         const fetchid = req.params.id;
