@@ -92,10 +92,10 @@ const TestResults = () => {
                 <Selector options={testOptions} handleSelect={handleSelectTestId}
                           name={"test"} saveId={selectedTestId}/>
 
-                <button className="TestResults__settings-bar__button">
+                <a className="TestResults__settings-bar__button" href={`http://217.18.60.195:8080/export/${selectedTestId}`} download>
                     Скачать в Excel
                     <Icons type={"download-png"} width={25} height={25}/>
-                </button>
+                </a>
             </div>
             <table className={"table"}>
                 {tableHead}
