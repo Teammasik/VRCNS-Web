@@ -191,9 +191,19 @@ app.get('/fetchById/:id', (req, res) => {
 // http://217.18.60.195:8080/testResults/1
 app.get('/testResults/:test', (req, res) => {
     const fetchid=req.params.test;
-    pool.execute("SELECT id, userName, userSurname, userGroup, mark FROM `students` where test = ?", [fetchid])
+    pool.execute("SELECT id, userName, userSurname, userGroup, mark, uDate, points FROM `students` where test = ?", [fetchid])
         .then(result =>{
             result = result[0];
+
+            result.forEach(item => {
+                try{
+                    item.uDate = item.uDate.toString().substring(0,15)
+                }
+                catch{
+
+                }
+            });
+            //.format('YYYY-mm-DD hh:mm a')
             res.send({
                 result
             })
@@ -261,13 +271,66 @@ app.get('/testPercentResult/:test', (req, res) => {
 });
 
 
+// the most trashy trash I've ever wrote, gonna rewrite it later
+// http://217.18.60.195:8080/allData
+app.get('/allData', (req, res) => {
+    pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = 1')
+        .then(result => {
+            pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<16 and points>10 and test = 1')
+                .then(result1 => {
+                    pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<21 and points>15 and test = 1')
+                    .then(result2 => {
+                        pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = 1')
+                        .then(result3 => {
+                            pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = 2')
+                                .then(result4 => {
+                                    pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<16 and points>10 and test = 2')
+                                        .then(result5 => {
+                                            pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<21 and points>15 and test = 2')
+                                            .then(result6 => {
+                                                pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = 2')
+                                                .then(result7 => {
+                                                    var summ = result[0][0].pnts + result1[0][0].pnts + result2[0][0].pnts + result3[0][0].pnts
+                                                    var summ2 = result4[0][0].pnts + result5[0][0].pnts + result6[0][0].pnts + result7[0][0].pnts
+                                                    var answer = {
+                                                        firstTest: {test: 1,
+                                                            data: {
+                                                                10: Math.round(result[0][0].pnts/summ*100),
+                                                                15: Math.round(result1[0][0].pnts/summ*100),
+                                                                20: Math.round(result2[0][0].pnts/summ*100),
+                                                                25: Math.round(result3[0][0].pnts/summ*100),
+                                                            }},
+                                                        secondTest: {
+                                                            test: 2,
+                                                            data: {
+                                                                10: Math.round(result4[0][0].pnts/summ2*100),
+                                                                15: Math.round(result5[0][0].pnts/summ2*100),
+                                                                20: Math.round(result6[0][0].pnts/summ2*100),
+                                                                25: Math.round(result7[0][0].pnts/summ2*100),
+                                                            }
+                                                        }
+                                                    }
+                                                    res.send({answer});
+                                                    console.log("request testPercentResult completed successfully");
+                                                })
+                                            })
+                                        })
+                                })   
+                        })
+                    })
+                })
+        })   
+        
+});
+
+
 // http://217.18.60.195:8080/testList
 app.get('/testList', (req, res) => {
-    pool.execute("SELECT id, test FROM `tests`")
+    pool.execute("SELECT id FROM `tests`")
         .then((result)=>{
             result = result[0]
             res.send({result})
-            console.log("request testList completed successfully")
+            //console.log("request testList completed successfully")
         })
 });
 
