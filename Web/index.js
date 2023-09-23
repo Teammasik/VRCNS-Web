@@ -96,7 +96,7 @@ app.get('/export/:id', (req, res)=>{
 
 // http://217.18.60.195:8080/sendData
 app.post('/sendData', (req,res) => {
-    pool.execute("insert into students(userName,userSurname, userGroup, mark, uDate, points, test) VALUES (?,?,?,?,?,?,?)", [req.body.name, req.body.surname,req.body.group,req.body.mark,req.body.udate,req.body.points,req.body.test])
+    pool.execute("insert into students(userName,userSurname, userGroup, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?,?)", [req.body.name, req.body.surname,req.body.group,req.body.mark,req.body.udate,req.body.points,req.body.test])
         .then(() => {
             res.send(req.body)
             console.log("successfully sent data ")
@@ -191,7 +191,7 @@ app.get('/fetchById/:id', (req, res) => {
 // http://217.18.60.195:8080/testResults/1
 app.get('/testResults/:test', (req, res) => {
     const fetchid=req.params.test;
-    pool.execute("SELECT id, userName, userSurname, userGroup, mark, uDate, points FROM `students` where test = ?", [fetchid])
+    pool.execute("SELECT id, userName, userSurname, userGroup, mark, uTime, uDate, points FROM `students` where test = ?", [fetchid])
         .then(result =>{
             result = result[0];
 
@@ -293,14 +293,14 @@ app.get('/allData', (req, res) => {
                                                     var summ = result[0][0].pnts + result1[0][0].pnts + result2[0][0].pnts + result3[0][0].pnts
                                                     var summ2 = result4[0][0].pnts + result5[0][0].pnts + result6[0][0].pnts + result7[0][0].pnts
                                                     var answer = {
-                                                        firstTest: {test: 1,
+                                                        1: {test: 1,
                                                             data: {
                                                                 10: Math.round(result[0][0].pnts/summ*100),
                                                                 15: Math.round(result1[0][0].pnts/summ*100),
                                                                 20: Math.round(result2[0][0].pnts/summ*100),
                                                                 25: Math.round(result3[0][0].pnts/summ*100),
                                                             }},
-                                                        secondTest: {
+                                                        2: {
                                                             test: 2,
                                                             data: {
                                                                 10: Math.round(result4[0][0].pnts/summ2*100),
@@ -326,11 +326,11 @@ app.get('/allData', (req, res) => {
 
 // http://217.18.60.195:8080/testList
 app.get('/testList', (req, res) => {
-    pool.execute("SELECT id FROM `tests`")
+    pool.execute("SELECT id, test FROM `tests`")
         .then((result)=>{
             result = result[0]
             res.send({result})
-            //console.log("request testList completed successfully")
+            console.log("request testList completed successfully")
         })
 });
 
