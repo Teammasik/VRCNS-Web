@@ -305,8 +305,15 @@ app.get('/allData', (req, res) => {
 // http://217.18.60.195:8080/testList
 app.get('/testList', (req, res) => {
     pool.execute("SELECT id, test FROM `tests`")
-        .then((data)=>{
-            data = data[0]
+        .then((result)=>{
+            result = result[0]
+            var data = []
+            result.forEach(item => {
+                data.push({
+                    id: item.id,
+                    name: item.test
+                })
+            });
             res.send({data})
             console.log("request testList completed successfully")
         })
