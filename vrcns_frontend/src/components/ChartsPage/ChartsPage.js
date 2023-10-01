@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from "react-redux";
 import "./ChartsPage.scss"
 import CollapseWindow from "../CollapseWindow/CollapseWindow";
 import {fetchStatisticData} from "../api/ChartResultSlice";
+import {pieChartMapper} from "../../constants";
 
 const ChartsPage = () => {
 
@@ -22,6 +23,8 @@ const ChartsPage = () => {
             Object.keys(el.data).map(e => {
                 test.push({name: e, value: el.data[e]})
             })
+
+            test.reverse()
 
             temp.push({data: test, test: el.test});
         })
@@ -55,11 +58,11 @@ const ChartsPage = () => {
                         <PieChart width={barWidth} height={barHeight}>
                             <Legend/>
                             <Pie nameKey={"name"} data={el.data} dataKey={"value"} label animationDuration={1000}>
-                                {/*<Cell fill={"#e71c3b"}/>*/}
-                                <Cell fill={"#e7771c"}/>
-                                <Cell fill={"#fdc509"}/>
-                                <Cell fill={"#cce71c"}/>
-                                <Cell fill={"#82ca9d"}/>
+                                {
+                                    pieChartMapper[el.data.length].map(e => {
+                                        return <Cell fill={e} key ={e}/>
+                                    })
+                                }
                             </Pie>
                         </PieChart>
                         {/*<PieChart width={barWidth} height={barHeight} key={el.id+"_percent_chart"}>*/}
