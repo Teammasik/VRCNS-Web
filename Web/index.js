@@ -72,7 +72,7 @@ app.get('/export/:id', (req, res)=>{
             });
 
             //this thing is for correct formats and name of xls file
-            var today = new Date();
+            let today = new Date();
             const now = today.toLocaleString('ru-RU', { year: 'numeric', month: 'numeric', day: 'numeric' });
             res.setHeader(
                 "Content-Type",
@@ -177,10 +177,10 @@ app.get('/points', (req, res) => {
 app.get('/fetchById/:id', (req, res) => {
     const fetchid=req.params.id;
     pool.execute('select id, userName, userSurname, userGroup from `students` where id=?', [fetchid])
-        .then(result =>{
-            result = result[0];
+        .then(data =>{
+            data = data[0];
             res.send({
-                result
+                data
             })
             console.log("request 'fetchById' completed successfully");
         })
@@ -192,10 +192,10 @@ app.get('/fetchById/:id', (req, res) => {
 app.get('/testResults/:test', (req, res) => {
     const fetchid=req.params.test;
     pool.execute("SELECT id, userName, userSurname, userGroup, mark, uTime, uDate, points FROM `students` where test = ?", [fetchid])
-        .then(result =>{
-            result = result[0];
+        .then(data =>{
+            data = data[0];
 
-            result.forEach(item => {
+            data.forEach(item => {
                 try{
                     item.uDate = item.uDate.toString().substring(0,15)
                 }
@@ -205,7 +205,7 @@ app.get('/testResults/:test', (req, res) => {
             });
             //.format('YYYY-mm-DD hh:mm a')
             res.send({
-                result
+                data
             })
             console.log("request 'testResults' completed successfully");
         })
@@ -215,28 +215,17 @@ app.get('/testResults/:test', (req, res) => {
 // http://217.18.60.195:8080/testScore/1
 app.get('/testScore/:test', (req, res) => {
     const fetchid=req.params.test;
-    pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = ?', [fetchid])
+    pool.execute('SELECT SUM(CASE WHEN points<11 and test=? THEN 1 ELSE 0 END)f1,SUM(CASE WHEN points<16 and points>10 and test=? THEN 1 ELSE 0 END)f2,SUM(CASE WHEN points<21 and points>15 and test=? THEN 1 ELSE 0 END)f3,SUM(CASE WHEN points<26 and points>20 and test=? THEN 1 ELSE 0 END)f4 FROM students', [fetchid,fetchid,fetchid,fetchid])
         .then(result => {
-            pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<16 and points>10 and test = ?', [fetchid])
-                .then(result1 => {
-                    pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<21 and points>15 and test = ?', [fetchid])
-                    .then(result2 => {
-                        pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = ?', [fetchid])
-                        .then(result3 => {
-                            var answer = {
-                                test: fetchid,
-                                data: {
-                                    10: result[0][0].pnts,
-                                    15: result1[0][0].pnts,
-                                    20: result2[0][0].pnts,
-                                    25: result3[0][0].pnts,
-                                }
-                            }
-                            res.send({answer});
-                            console.log("request testScore completed successfully");
-                        })
-                    })
-                })
+            result = result[0]
+            let data = [{
+                test: fetchid,
+                10: Number(result[0].f1),
+                15: Number(result[0].f2),
+                20: Number(result[0].f3),
+                25: Number(result[0].f4)
+            }]
+            res.send({data})
         })   
 });
 
@@ -244,29 +233,18 @@ app.get('/testScore/:test', (req, res) => {
 // http://217.18.60.195:8080/testPercentResult/1
 app.get('/testPercentResult/:test', (req, res) => {
     const fetchid=req.params.test;
-    pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = ?', [fetchid])
+    pool.execute('SELECT SUM(CASE WHEN points<11 and test=? THEN 1 ELSE 0 END)f1,SUM(CASE WHEN points<16 and points>10 and test=? THEN 1 ELSE 0 END)f2,SUM(CASE WHEN points<21 and points>15 and test=? THEN 1 ELSE 0 END)f3,SUM(CASE WHEN points<26 and points>20 and test=? THEN 1 ELSE 0 END)f4 FROM students', [fetchid,fetchid,fetchid,fetchid])
         .then(result => {
-            pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<16 and points>10 and test = ?', [fetchid])
-                .then(result1 => {
-                    pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<21 and points>15 and test = ?', [fetchid])
-                    .then(result2 => {
-                        pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = ?', [fetchid])
-                        .then(result3 => {
-                            var summ = result[0][0].pnts + result1[0][0].pnts + result2[0][0].pnts + result3[0][0].pnts
-                            var answer = {
-                                test: fetchid,
-                                data: {
-                                    10: Math.round(result[0][0].pnts/summ*100),
-                                    15: Math.round(result1[0][0].pnts/summ*100),
-                                    20: Math.round(result2[0][0].pnts/summ*100),
-                                    25: Math.round(result3[0][0].pnts/summ*100),
-                                }
-                            }
-                            res.send({answer});
-                            console.log("request testPercentResult completed successfully");
-                        })
-                    })
-                })
+            result = result[0]
+            let summ = Number(result[0].f1) + Number(result[0].f2) + Number(result[0].f3) + Number(result[0].f4)
+            let data = [{
+                test: fetchid,
+                10: Math.round(Number(result[0].f1)/summ*100),
+                15: Math.round(Number(result[0].f2)/summ*100),
+                20: Math.round(Number(result[0].f3)/summ*100),
+                25: Math.round(Number(result[0].f4)/summ*100)
+            }]
+            res.send({data})
         })   
 });
 
@@ -290,18 +268,18 @@ app.get('/allData', (req, res) => {
                                             .then(result6 => {
                                                 pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = 2')
                                                 .then(result7 => {
-                                                    var summ = result[0][0].pnts + result1[0][0].pnts + result2[0][0].pnts + result3[0][0].pnts
-                                                    var summ2 = result4[0][0].pnts + result5[0][0].pnts + result6[0][0].pnts + result7[0][0].pnts
-                                                    var answer = {
-                                                        1: {test: 1,
+                                                    let summ = result[0][0].pnts + result1[0][0].pnts + result2[0][0].pnts + result3[0][0].pnts
+                                                    let summ2 = result4[0][0].pnts + result5[0][0].pnts + result6[0][0].pnts + result7[0][0].pnts
+                                                    let data = [
+                                                        {test: 'assembly',
                                                             data: {
                                                                 10: Math.round(result[0][0].pnts/summ*100),
                                                                 15: Math.round(result1[0][0].pnts/summ*100),
                                                                 20: Math.round(result2[0][0].pnts/summ*100),
                                                                 25: Math.round(result3[0][0].pnts/summ*100),
                                                             }},
-                                                        2: {
-                                                            test: 2,
+                                                        {
+                                                            test: 'disassembly',
                                                             data: {
                                                                 10: Math.round(result4[0][0].pnts/summ2*100),
                                                                 15: Math.round(result5[0][0].pnts/summ2*100),
@@ -309,8 +287,8 @@ app.get('/allData', (req, res) => {
                                                                 25: Math.round(result7[0][0].pnts/summ2*100),
                                                             }
                                                         }
-                                                    }
-                                                    res.send({answer});
+                                                    ]
+                                                    res.send({data});
                                                     console.log("request testPercentResult completed successfully");
                                                 })
                                             })
@@ -329,7 +307,14 @@ app.get('/testList', (req, res) => {
     pool.execute("SELECT id, test FROM `tests`")
         .then((result)=>{
             result = result[0]
-            res.send({result})
+            var data = []
+            result.forEach(item => {
+                data.push({
+                    id: item.id,
+                    name: item.test
+                })
+            });
+            res.send({data})
             console.log("request testList completed successfully")
         })
 });
