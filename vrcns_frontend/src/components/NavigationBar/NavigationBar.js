@@ -5,7 +5,7 @@ import "./NavigationBar.scss";
 const NavigationBar = ({type}) => {
 
     const links = [
-        {link: "/test-results", name: "Результаты тестирования"},
+        {link: "/", name: "Результаты"},
         {link: "/charts", name: "Инфографика"},
     ];
 
@@ -18,7 +18,7 @@ const NavigationBar = ({type}) => {
                             display: "flex", alignItems: "center",
                             justifyContent: "center", fontFamily: '"Gill Sans", sans-serif',
                             fontSize: "17px", fontWeight: "bold"
-                        }}>VR CNS
+                        }}>Виртуальная лаборатория
                         </div>
                         <div className="NavigationBar__header__links">
                             {

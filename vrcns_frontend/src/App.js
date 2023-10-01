@@ -10,7 +10,7 @@ function App() {
             <NavigationBar type="header"/>
 
             <Routes>
-                <Route path={"test-results"} Component={TestResults}/>
+                <Route path={""} Component={TestResults}/>
                 <Route path={"charts"} Component={ChartsPage}/>
             </Routes>
         </div>

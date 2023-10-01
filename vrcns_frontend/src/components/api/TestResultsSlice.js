@@ -1,27 +1,14 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
+import {_api_url} from "../../constants";
 
 export const fetchResultTable = createAsyncThunk(
     'results/resultTable',
     async (arg, thunkAPI) => {
         try {
-            const response = await fetch(`http://217.18.60.195:8080/testResults/${arg.id}`)
+            const response = await fetch(`${_api_url}/testResults/${arg.id}`)
                 .then(response => response.json())
 
-            return response.result;
-        } catch (error) {
-            console.log(error)
-        }
-    }
-);
-
-export const fetchTestPercentResult= createAsyncThunk(
-    'results/resultTable',
-    async (arg, thunkAPI) => {
-        try {
-            const response = await fetch(`http://217.18.60.195:8080/testPercentResult/${arg.id}`)
-                .then(response => response.json())
-
-            return response.answer;
+            return response.data;
         } catch (error) {
             console.log(error)
         }
@@ -32,10 +19,10 @@ export const fetchTestList = createAsyncThunk(
     'results/testList',
     async (arg, thunkAPI) => {
         try {
-            const response = await fetch("http://217.18.60.195:8080/testList")
+            const response = await fetch(`${_api_url}/testList`)
                 .then(response => response.json())
 
-            return response.result;
+            return response.data;
         } catch (error) {
             console.log(error)
         }
@@ -45,48 +32,9 @@ export const fetchTestList = createAsyncThunk(
 export const testResultsSlice = createSlice({
     name: "testResults",
     initialState: {
-        testResultsTable: [],
-        testOption: [],
-        selectedUserInfo: {
-            name: "",
-            surname: "",
-            data: [
-                {name: "pass", value: 12},
-                {name: "failed", value: 2}
-            ]
-        },
-        testScoreData: [{
-            id: "test-1",
-            name: "Тест 1",
-            data: [
-                {name: "0-5", value: 1},
-                {name: "6-10", value: 2},
-                {name: "11-15", value: 8},
-                {name: "16-20", value: 6},
-                {name: "21-25", value: 2},
-            ]
-        }, {
-            id: "test-2",
-            name: "Тест 2",
-            data: [
-                {name: "0-5", value: 0},
-                {name: "6-10", value: 4},
-                {name: "11-15", value: 8},
-                {name: "16-20", value: 6},
-                {name: "21-25", value: 1},
-            ]
-        }, {
-            id: "test-3",
-            name: "Тест 3",
-            data: [
-                {name: "0-5", value: 2},
-                {name: "6-10", value: 4},
-                {name: "11-15", value: 8},
-                {name: "16-20", value: 4},
-                {name: "21-25", value: 1},
-            ]
-        }],
-        testPercentResults:[],
+        data: [],
+        testList: [],
+
         selectedTest: 1,
         selectedUserId: "",
 
@@ -105,12 +53,12 @@ export const testResultsSlice = createSlice({
         },
         [fetchResultTable.fulfilled]: (state, action) => {
             state.isLoading = false;
-            state.testResultsTable = action.payload;
+            state.data = action.payload;
         },
         [fetchResultTable.rejected]: state => {
             state.isLoading = false;
             state.error = {message: "Ошибка получения списка результатов"};
-            state.testResultsTable = [];
+            state.data = [];
         },
         [fetchTestList.pending]: state => {
             state.isLoading = true;
@@ -118,13 +66,13 @@ export const testResultsSlice = createSlice({
         },
         [fetchTestList.fulfilled]: (state, action) => {
             state.isLoading = false;
-            state.testOption = action.payload;
+            state.testList = action.payload;
         },
         [fetchTestList.rejected]: state => {
             state.isLoading = false;
             state.error = {message: "Ошибка получения списка тестов"};
-            state.testResultsTable = [];
-        },
+            state.testList = [];
+        }
     }
 })
 
