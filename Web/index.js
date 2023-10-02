@@ -268,27 +268,136 @@ app.get('/allData', (req, res) => {
                                             .then(result6 => {
                                                 pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = 2')
                                                 .then(result7 => {
-                                                    let summ = result[0][0].pnts + result1[0][0].pnts + result2[0][0].pnts + result3[0][0].pnts
-                                                    let summ2 = result4[0][0].pnts + result5[0][0].pnts + result6[0][0].pnts + result7[0][0].pnts
-                                                    let data = [
-                                                        {test: 'assembly',
-                                                            data: {
-                                                                10: Math.round(result[0][0].pnts/summ*100),
-                                                                15: Math.round(result1[0][0].pnts/summ*100),
-                                                                20: Math.round(result2[0][0].pnts/summ*100),
-                                                                25: Math.round(result3[0][0].pnts/summ*100),
-                                                            }},
-                                                        {
-                                                            test: 'disassembly',
-                                                            data: {
-                                                                10: Math.round(result4[0][0].pnts/summ2*100),
-                                                                15: Math.round(result5[0][0].pnts/summ2*100),
-                                                                20: Math.round(result6[0][0].pnts/summ2*100),
-                                                                25: Math.round(result7[0][0].pnts/summ2*100),
+                                                    pool.execute('SELECT COUNT(students.userName) as "counts", students.test FROM students GROUP BY students.userName, students.test')
+                                                    .then(result8 => {
+                                                        result8 = result8[0]
+                                                        // looks bad :/
+                                                        let counted = [0,0,0,0];
+                                                        let counted2 = [0,0,0,0];
+                                                        result8.forEach(item => {
+                                                            if (item.counts == 1 & item.test == 1){
+                                                                counted[0]++
                                                             }
-                                                        }
+                                                            if(item.counts == 2 & item.test == 1){
+                                                                counted[1]++
+                                                            }
+                                                            if(item.counts == 3 & item.test == 1){
+                                                                counted[2]++
+                                                            }
+                                                            if(item.counts > 3 & item.test == 1){
+                                                                counted[3]++
+                                                            }
+                                                            if (item.counts == 1 & item.test == 2){
+                                                                counted2[0]++
+                                                            }
+                                                            if(item.counts == 2 & item.test == 2){
+                                                                counted2[1]++
+                                                            }
+                                                            if(item.counts == 3 & item.test == 2){
+                                                                counted2[2]++
+                                                            }
+                                                            if(item.counts > 3 & item.test == 2){
+                                                                counted2[3]++
+                                                            }
+                                                            
+                                                        });
+      
+                                                        let summ = result[0][0].pnts + result1[0][0].pnts + result2[0][0].pnts + result3[0][0].pnts
+                                                        let summ2 = result4[0][0].pnts + result5[0][0].pnts + result6[0][0].pnts + result7[0][0].pnts
+                                                        let data = [
+                                                        {test: 1,
+                                                            name: "assembly",
+                                                            pointsData: {
+                                                                data:[
+                                                                    {
+                                                                        name: "0-10",
+                                                                        value: Math.round(result[0][0].pnts/summ*100)
+                                                                    },
+                                                                    {
+                                                                        name: "10-15",
+                                                                        value: Math.round(result1[0][0].pnts/summ*100)
+                                                                    },
+                                                                    {
+                                                                        name: "15-20",
+                                                                        value: Math.round(result2[0][0].pnts/summ*100)
+                                                                    },
+                                                                    {
+                                                                        name: "20-25",
+                                                                        value: Math.round(result3[0][0].pnts/summ*100)
+                                                                    }
+                                                                ]
+                                                         
+                                                            },
+                                                            attemptsData:{
+                                                                data:[
+                                                                    {
+                                                                        name: "с 1-й попытки",
+                                                                        value: counted[0]
+                                                                    },
+                                                                    {
+                                                                        name:"со 2-й попытки",
+                                                                        value: counted[1]
+                                                                    },
+                                                                    {
+                                                                        name:"с 3-й попытки",
+                                                                        value: counted[2]
+                                                                    },
+                                                                    {
+                                                                        name:"с 4-й попытки и более",
+                                                                        value: counted[3]
+                                                                    }
+                                                                ]
+                                                            }
+                                                            },
+                                                        {test: 2,
+                                                            name: "disassembly",
+                                                            pointsData: {
+                                                                data:[
+                                                                    {
+                                                                        name: "0-10",
+                                                                        value: Math.round(result4[0][0].pnts/summ2*100)
+                                                                    },
+                                                                    {
+                                                                        name: "10-15",
+                                                                        value: Math.round(result5[0][0].pnts/summ2*100)
+                                                                    },
+                                                                    {
+                                                                        name: "15-20",
+                                                                        value: Math.round(result6[0][0].pnts/summ2*100)
+                                                                    },
+                                                                    {
+                                                                        name: "20-25",
+                                                                        value: Math.round(result7[0][0].pnts/summ2*100)
+                                                                    }
+                                                                    ]
+                                                             
+                                                                },  
+                                                                attemptsData:{
+                                                                    data:[
+                                                                        {
+                                                                            name: "с 1-й попытки",
+                                                                            value: counted2[0]
+                                                                        },
+                                                                        {
+                                                                            name:"со 2-й попытки",
+                                                                            value: counted2[1]
+                                                                        },
+                                                                        {
+                                                                            name:"с 3-й попытки",
+                                                                            value: counted2[2]
+                                                                        },
+                                                                        {
+                                                                            name:"с 4-й попытки и более",
+                                                                            value: counted2[3]
+                                                                        }
+                                                                    ]
+                                                                }
+                                                                },
                                                     ]
                                                     res.send({data});
+                                                    })
+                                                    
+                                                    
                                                     console.log("request testPercentResult completed successfully");
                                                 })
                                             })
