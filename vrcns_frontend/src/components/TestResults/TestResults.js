@@ -6,30 +6,28 @@ import TestSettingsBar from "../TestSettingsBar/TestSettingsBar";
 import Loader from "../UI/Loader/Loader";
 import {fetchUserData} from "../api/UserResultsSlice";
 import UserTestInfo from "../UserTestInfo/userTestInfo";
+import {tableMapper} from "../../constants";
 
 
 const TestResults = () => {
 
     const dispatch = useDispatch();
 
-    const tableMapper = [
-        {key: "item", name: "№"},
-        {key: "uDate", name: "Дата"},
-        {key: "userSurname", name: "Фамилия"},
-        {key: "userName", name: "Имя"},
-        {key: "userGroup", name: "Группа"},
-        {key: "uTime", name: "Время"},
-        {key: "points", name: "Баллы"},
-        {key: "mark", name: "Оценка"},
-    ]
-
     const selectedTestId = useSelector(state => state.testResults.selectedTest)
     const results = useSelector(state => state.testResults.data);
     const isLoading = useSelector(state => state.testResults.isLoading);
 
+    // const [prepareResult, setPrepareResult] = useState([]);
+    const [isModalOpen, setModal] = useState(false);
+
     const handleClick = (id) => {
-        dispatch(fetchUserData(id));
+        setModal(!isModalOpen);
+        dispatch(fetchUserData({id: id}));
     }
+
+    // useEffect(() => {
+    //     setPrepareResult(results)
+    // }, [results]);
 
     useEffect(() => {
         dispatch(fetchResultTable({id: selectedTestId}));
@@ -45,9 +43,41 @@ const TestResults = () => {
     </tr>
     </thead>
 
+    // const handleSortString = () => {
+    //
+    //     let data = [...results];
+    //
+    //     data.sort((a, b) => {
+    //         const nameA = a.userSurname.toUpperCase(); // ignore upper and lowercase
+    //         const nameB = b.userSurname.toUpperCase(); // ignore upper and lowercase
+    //         if (nameA < nameB) {
+    //             return -1;
+    //         }
+    //         if (nameA > nameB) {
+    //             return 1;
+    //         }
+    //
+    //         // names must be equal
+    //         return 0;
+    //     })
+    //
+    //     setPrepareResult(data)
+    // }
+    //
+    // const handleSortNumbers = () => {
+    //
+    //     let data = [...prepareResult];
+    //
+    //     data.sort((a, b) => a.value - b.value);
+    //
+    //     console.log(data)
+    //
+    //     setPrepareResult(data)
+    // }
+
     const tableBody = results && <tbody>{
         results.map((user, index) => {
-            return <tr key={user.id} onClick={() => handleClick()}>
+            return <tr key={user.id} onClick={() => handleClick(user.id)}>
                 <td>{index + 1}</td>
                 {
                     tableMapper.map((e, index) => {
@@ -61,7 +91,6 @@ const TestResults = () => {
     </tbody>
 
 
-
     return (
         <div className={"TestResults"}>
             {isLoading && <Loader/>}
@@ -70,7 +99,7 @@ const TestResults = () => {
                 {tableHead}
                 {tableBody}
             </table>
-            <UserTestInfo/>
+            <UserTestInfo isModalOpen={isModalOpen} closeModal={() =>setModal(false)}/>
         </div>
     );
 }

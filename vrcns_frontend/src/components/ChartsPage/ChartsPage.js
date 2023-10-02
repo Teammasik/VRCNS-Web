@@ -5,32 +5,13 @@ import "./ChartsPage.scss"
 import CollapseWindow from "../CollapseWindow/CollapseWindow";
 import {fetchStatisticData} from "../api/ChartResultSlice";
 import {pieChartMapper} from "../../constants";
+import {log10} from "chart.js/helpers";
 
 const ChartsPage = () => {
 
-    const data = useSelector(state => state.chartResults.data);
+    const dataTest = useSelector(state => state.chartResults.data);
 
     const dispatch = useDispatch();
-    const [dataTest, setDataTest] = useState([]);
-
-    useEffect(() => {
-
-        let temp = [];
-
-        data.map(el => {
-            let test = []
-
-            Object.keys(el.data).map(e => {
-                test.push({name: e, value: el.data[e]})
-            })
-
-            test.reverse()
-
-            temp.push({data: test, test: el.test});
-        })
-
-        setDataTest(temp);
-    }, [data]);
 
     const useBarChartSize = () => {
         const [size, setSize] = useState([0, 0]);
@@ -54,28 +35,29 @@ const ChartsPage = () => {
     return (<div>
             {
                 dataTest && dataTest.map(el => {
-                    return <CollapseWindow title={el.test} id={el.test + "_id"} key={el.test + "_key"}>
+                    return <CollapseWindow title={el.name} id={el.name + "_id"} key={el.name + "_key"}>
                         <PieChart width={barWidth} height={barHeight}>
                             <Legend/>
-                            <Pie nameKey={"name"} data={el.data} dataKey={"value"} label animationDuration={1000}>
+                            <Pie nameKey={"name"} data={el.pointsData.data} dataKey={"value"} label
+                                 animationDuration={1000}>
                                 {
-                                    pieChartMapper[el.data.length].map(e => {
-                                        return <Cell fill={e} key ={e}/>
+                                    pieChartMapper[el.pointsData.data.length].map(e => {
+                                        return <Cell fill={e} key={e}/>
                                     })
                                 }
                             </Pie>
                         </PieChart>
-                        {/*<PieChart width={barWidth} height={barHeight} key={el.id+"_percent_chart"}>*/}
-                        {/*    <Legend key={el.id+"_percent_chart_legend"}/>*/}
-                        {/*    <Pie nameKey={"results"} data={el.data} dataKey={"value"} label*/}
-                        {/*         animationDuration={1000} key={el.id+"_percent_chart_pie"}>*/}
-                        {/*        <Cell fill={"#e71c3b"}/>*/}
-                        {/*        <Cell fill={"#e7771c"}/>*/}
-                        {/*        <Cell fill={"#fdc509"}/>*/}
-                        {/*        <Cell fill={"#cce71c"}/>*/}
-                        {/*        <Cell fill={"#82ca9d"}/>*/}
-                        {/*    </Pie>*/}
-                        {/*</PieChart>*/}
+                        <PieChart width={barWidth} height={barHeight}>
+                            <Legend/>
+                            <Pie nameKey={"name"} data={el.attemptsData.data} dataKey={"value"} label
+                                 animationDuration={1000}>
+                                {
+                                    pieChartMapper[el.attemptsData.data.length].map(e => {
+                                        return <Cell fill={e} key={e}/>
+                                    })
+                                }
+                            </Pie>
+                        </PieChart>
                     </CollapseWindow>
                 })
             }

@@ -3,7 +3,7 @@ import {_api_url} from "../../constants";
 import {fetchPercentResult, fetchResult, fetchResultTable, fetchTestList, testResultsSlice} from "./TestResultsSlice";
 
 export const fetchStatisticData = createAsyncThunk(
-    'results/testList',
+    'chartPge/statistic',
     async (arg, thunkAPI) => {
         try {
             const response = await fetch(`${_api_url}/allData`)

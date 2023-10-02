@@ -9,7 +9,7 @@ export const fetchUserData = createAsyncThunk(
             const response = await fetch(`${_api_url}/fetchById/${arg.id}`)
                 .then(response => response.json())
 
-            return response.results[0];
+            return response.data[0];
         } catch (error) {
             console.log(error)
         }
