@@ -175,18 +175,40 @@ app.get('/points', (req, res) => {
 
 
 // http://217.18.60.195:8080/fetchbyid/1
-app.get('/fetchById/:id', (req, res) => {
+app.get('/fetchById/:id', async (req, res) => {
     const fetchid = req.params.id;
+    let errors = await queryAll("SELECT students.id,error.content, errortype.description FROM error,students,errortype WHERE error.student_id=students.id and error.type_id = errortype.id and students.id = ?", [fetchid])
+
     pool.execute('select id, userName, userSurname, userGroup from `students` where id=?', [fetchid])
-        .then(data => {
-            data = data[0];
-            res.send({
-                data
-            })
-            console.log("request 'fetchById' completed successfully");
+        .then( async result => {               //here I'm filling list with data from 'errors' variable
+            try {
+                let list = []
+                errors[0].forEach(item => {
+                    list.push({
+                        mistakeMessage: item.description + " " + item.content
+                    })
+                });
+                
+                var data = [
+                    {
+                        id: result[0][0].id,
+                        userName: result[0][0].userName,
+                        userSurname: result[0][0].userSurname,
+                        userGroup: result[0][0].userGroup,
+                        mistakes: list
+                    }
+                ]
+    
+                res.send({
+                    data
+                })
+                console.log("request 'fetchById' completed successfully");
+            } catch (error) {
+                console.log(error)
+            }
+            
         })
 });
-
 
 
 // http://217.18.60.195:8080/testResults/1
@@ -451,6 +473,7 @@ app.get('/errorsById/:id', (req, res) => {
                 })
             });
             res.send({ data })
+            console.log("request 'errorsById' completed successfully")
         })
 });
 
@@ -636,10 +659,10 @@ app.get('/errorsById/:id', (req, res) => {
 //     return ss
 // }
 
-// async function queryAll(sql, mass) {
-//     const ss = await pool.query(sql, mass)
-//     return ss
-// }
+async function queryAll(sql, mass) {
+    //const ss = await pool.query(sql, mass)
+    return await pool.query(sql, mass)
+}
 
 
 
