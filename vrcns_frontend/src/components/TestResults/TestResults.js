@@ -6,8 +6,8 @@ import TestSettingsBar from "../TestSettingsBar/TestSettingsBar";
 import Loader from "../UI/Loader/Loader";
 import {fetchUserData} from "../api/UserResultsSlice";
 import UserTestInfo from "../UserTestInfo/userTestInfo";
-import {tableMapper} from "../../constants";
-
+import {userTestMapper} from "../../constants";
+import SimpleTable from "../Table/SimpleTable";
 
 const TestResults = () => {
 
@@ -22,26 +22,12 @@ const TestResults = () => {
 
     const handleClick = (id) => {
         setModal(!isModalOpen);
-        dispatch(fetchUserData({id: id}));
+        dispatch(fetchUserData({id: id}))
     }
-
-    // useEffect(() => {
-    //     setPrepareResult(results)
-    // }, [results]);
 
     useEffect(() => {
         dispatch(fetchResultTable({id: selectedTestId}));
     }, [selectedTestId]);
-
-    const tableHead = <thead>
-    <tr>
-        {
-            tableMapper.map(el => {
-                return <th key={el.key}>{el.name}</th>
-            })
-        }
-    </tr>
-    </thead>
 
     // const handleSortString = () => {
     //
@@ -75,31 +61,12 @@ const TestResults = () => {
     //     setPrepareResult(data)
     // }
 
-    const tableBody = results && <tbody>{
-        results.map((user, index) => {
-            return <tr key={user.id} onClick={() => handleClick(user.id)}>
-                <td>{index + 1}</td>
-                {
-                    tableMapper.map((e, index) => {
-                        if (index > 0)
-                            return <td key={e.key + `_${user.name}`}>{user[e.key]}</td>
-                    })
-                }
-            </tr>
-        })
-    }
-    </tbody>
-
-
     return (
         <div className={"TestResults"}>
             {isLoading && <Loader/>}
             <TestSettingsBar/>
-            <table className={"table"}>
-                {tableHead}
-                {tableBody}
-            </table>
-            <UserTestInfo isModalOpen={isModalOpen} closeModal={() =>setModal(false)}/>
+            <SimpleTable data={results} tableMapper={userTestMapper} handleClick={handleClick}/>
+            <UserTestInfo isModalOpen={isModalOpen} closeModal={() => setModal(false)}/>
         </div>
     );
 }

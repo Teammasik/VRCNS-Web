@@ -1,6 +1,6 @@
 {
-  "name": "VRCNS",
-  "version": "0.2.0",
+  "name": "Virtual laboratory",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",

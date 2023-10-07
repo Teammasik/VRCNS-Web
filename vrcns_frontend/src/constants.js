@@ -1,6 +1,6 @@
 export const _api_url = "http://217.18.60.195:8080"
 
-export const tableMapper = [
+export const userTestMapper = [
     {key: "item", name: "№"},
     {key: "uDate", name: "Дата"},
     {key: "userSurname", name: "Фамилия"},
@@ -9,6 +9,17 @@ export const tableMapper = [
     {key: "uTime", name: "Время"},
     {key: "points", name: "Баллы"},
     {key: "mark", name: "Оценка"},
+]
+
+export const userMistakesMapper = [
+    {key: "item", name: "№"},
+    {key: "mistakeMessage", name: "Ошибка"}
+]
+
+
+export const userTestMistakesMapper = [
+    {key: "item", name: "№"},
+    {key: "errorMessage", name: "Ошибка"},
 ]
 
 export const pieChartMapper = {

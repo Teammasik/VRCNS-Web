@@ -1,6 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {_api_url} from "../../constants";
-import {testResultsSlice} from "./TestResultsSlice";
 
 export const fetchUserData = createAsyncThunk(
     'data/UserData',
