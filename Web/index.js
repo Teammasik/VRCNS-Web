@@ -5,6 +5,7 @@ const require = createRequire(import.meta.url); // those two rows make "require"
 
 import { PORT, pool } from "./connection.js"; // get_connection is a pool, if I'm not mistaken
 import { stringify } from "querystring";
+import { error } from "console";
 
 
 const express = require('express');
@@ -182,29 +183,37 @@ app.get('/fetchById/:id', async (req, res) => {
     pool.execute('select id, userName, userSurname, userGroup from `students` where id=?', [fetchid])
         .then( async result => {               //here I'm filling list with data from 'errors' variable
             try {
-                let list = []
-                errors[0].forEach(item => {
+
+                if (Object.keys(result[0]).length == 0){
+                    res.send(null)  
+                    throw(console.log("failed to get data, incorrect id: " + fetchid + ", pass correct id"))
+                }
+                else{
+                    let list = []
+                    errors[0].forEach(item => {
                     list.push({
                         mistakeMessage: item.description + " " + item.content
-                    })
-                });
+                        })
+                    });
                 
-                var data = [
-                    {
-                        id: result[0][0].id,
-                        userName: result[0][0].userName,
-                        userSurname: result[0][0].userSurname,
-                        userGroup: result[0][0].userGroup,
-                        mistakes: list
-                    }
-                ]
-    
-                res.send({
-                    data
-                })
-                console.log("request 'fetchById' completed successfully");
+                    var data = [
+                        {
+                            id: result[0][0].id,
+                            userName: result[0][0].userName,
+                            userSurname: result[0][0].userSurname,
+                            userGroup: result[0][0].userGroup,
+                            mistakes: list
+                        }
+                    ]
+        
+                    res.send({
+                        data
+                    })
+                    console.log("request 'fetchById' completed successfully");
+                }
+                
             } catch (error) {
-                console.log(error)
+                //console.log(error)
             }
             
         })
