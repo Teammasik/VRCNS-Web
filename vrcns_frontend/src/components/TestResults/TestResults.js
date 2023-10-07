@@ -8,17 +8,30 @@ import {fetchUserData} from "../api/UserResultsSlice";
 import UserTestInfo from "../UserTestInfo/userTestInfo";
 import {userTestMapper} from "../../constants";
 import SimpleTable from "../Table/SimpleTable";
+import TestTable from "../Table/TestTable";
 
 const TestResults = () => {
 
     const dispatch = useDispatch();
 
     const selectedTestId = useSelector(state => state.testResults.selectedTest)
-    const results = useSelector(state => state.testResults.data);
+    const testData = useSelector(state => state.testResults.data);
     const isLoading = useSelector(state => state.testResults.isLoading);
 
-    // const [prepareResult, setPrepareResult] = useState([]);
     const [isModalOpen, setModal] = useState(false);
+
+    const prepareData = testData.map((el, index) => {
+        const temp = {};
+
+        for (const param in el) {
+            temp[param] = el[param]
+        }
+
+        temp.number = index + 1;
+        temp.uDate = new Date(temp.uDate).getDay() + "-" + new Date(temp.uDate).getMonth() + "-" + new Date(temp.uDate).getFullYear();
+
+        return temp;
+    })
 
     const handleClick = (id) => {
         setModal(!isModalOpen);
@@ -29,43 +42,32 @@ const TestResults = () => {
         dispatch(fetchResultTable({id: selectedTestId}));
     }, [selectedTestId]);
 
-    // const handleSortString = () => {
-    //
-    //     let data = [...results];
-    //
-    //     data.sort((a, b) => {
-    //         const nameA = a.userSurname.toUpperCase(); // ignore upper and lowercase
-    //         const nameB = b.userSurname.toUpperCase(); // ignore upper and lowercase
-    //         if (nameA < nameB) {
-    //             return -1;
-    //         }
-    //         if (nameA > nameB) {
-    //             return 1;
-    //         }
-    //
-    //         // names must be equal
-    //         return 0;
-    //     })
-    //
-    //     setPrepareResult(data)
-    // }
-    //
-    // const handleSortNumbers = () => {
-    //
-    //     let data = [...prepareResult];
-    //
-    //     data.sort((a, b) => a.value - b.value);
-    //
-    //     console.log(data)
-    //
-    //     setPrepareResult(data)
-    // }
+    const handleSortString = (name) => {
+
+        prepareData.sort((a, b) => {
+            const nameA = a[name];
+            const nameB = b[name];
+            if (nameA < nameB) {
+                return -1;
+            }
+            if (nameA > nameB) {
+                return 1;
+            }
+
+            return 0;
+        })
+    }
+
+    const handleSortNumbers = (name) => {
+        prepareData.sort((a, b) => a[name] - b[name]);
+    }
 
     return (
         <div className={"TestResults"}>
             {isLoading && <Loader/>}
             <TestSettingsBar/>
-            <SimpleTable data={results} tableMapper={userTestMapper} handleClick={handleClick}/>
+            <TestTable data={prepareData} tableMapper={userTestMapper} handleClick={handleClick}
+                       onHeaderClick={handleSortString}/>
             <UserTestInfo isModalOpen={isModalOpen} closeModal={() => setModal(false)}/>
         </div>
     );

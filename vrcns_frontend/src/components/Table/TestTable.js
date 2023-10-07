@@ -1,13 +1,15 @@
-import React from "react";
+import React, {useEffect} from "react";
 import "./Table.scss"
 
-const SimpleTable = ({data, tableMapper, handleClick}) => {
+const TestTable = ({data, tableMapper, handleClick, onHeaderClick}) => {
 
     const tableHead = <thead>
     <tr>
         {
             tableMapper.map(el => {
-                return <th key={el.key}>{el.name}</th>
+                return <th onClick={() => {
+                    onHeaderClick(el.key)
+                }} key={el.key}>{el.name}</th>
             })
         }
     </tr>
@@ -18,7 +20,7 @@ const SimpleTable = ({data, tableMapper, handleClick}) => {
             return <tr key={item.id} onClick={() => handleClick(item.id)}>
                 {
                     tableMapper.map((e) => {
-                            return <td key={e.key + `_${item.name}`}>{item[e.key]}</td>
+                        return <td key={e.key + `_${item.name}`}>{item[e.key]}</td>
                     })
                 }
             </tr>
@@ -26,7 +28,7 @@ const SimpleTable = ({data, tableMapper, handleClick}) => {
     }
     </tbody>
 
-    return(
+    return (
         <>
             <table className={"table"}>
                 {tableHead}
@@ -36,4 +38,4 @@ const SimpleTable = ({data, tableMapper, handleClick}) => {
     );
 }
 
-export default SimpleTable;
+export default TestTable;

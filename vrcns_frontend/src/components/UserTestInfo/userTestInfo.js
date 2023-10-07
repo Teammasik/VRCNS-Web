@@ -15,13 +15,25 @@ const UserTestInfo = ({isModalOpen, closeModal}) => {
 
     const isLoading = useSelector(state => state.userResults.isLoading);
 
+    const prepareData = mistakes && mistakes.map((el, index) => {
+        const temp = {};
+
+        for (const param in el) {
+            temp[param] = el[param]
+        }
+
+        temp.number = index + 1;
+
+        return temp;
+    })
+
     return (
         <Modal isModalOpen={isModalOpen} closeModal={closeModal} title={surname + " " + name + " " + group}>
             {
                 isLoading ? <Loader type={"window_loader"}/> : <div className="UserTestInfo">
                     <div>
                         Совершённые ошибки
-                        <SimpleTable data={mistakes} tableMapper={userMistakesMapper} handleClick={() => {
+                        <SimpleTable data={prepareData} tableMapper={userMistakesMapper} handleClick={() => {
                         }}/>
                     </div>
                 </div>

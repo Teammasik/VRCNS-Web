@@ -1,7 +1,7 @@
 export const _api_url = "http://217.18.60.195:8080"
 
 export const userTestMapper = [
-    {key: "item", name: "№"},
+    {key: "number", name: "№"},
     {key: "uDate", name: "Дата"},
     {key: "userSurname", name: "Фамилия"},
     {key: "userName", name: "Имя"},
@@ -12,7 +12,7 @@ export const userTestMapper = [
 ]
 
 export const userMistakesMapper = [
-    {key: "item", name: "№"},
+    {key: "number", name: "№"},
     {key: "mistakeMessage", name: "Ошибка"}
 ]
 
