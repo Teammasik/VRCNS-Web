@@ -32,9 +32,12 @@ const UserTestInfo = ({isModalOpen, closeModal}) => {
             {
                 isLoading ? <Loader type={"window_loader"}/> : <div className="UserTestInfo">
                     <div>
-                        Совершённые ошибки
-                        <SimpleTable data={prepareData} tableMapper={userMistakesMapper} handleClick={() => {
-                        }}/>
+                        {
+                            prepareData && prepareData.length > 0 ? <> Совершённые ошибки
+                                <SimpleTable data={prepareData} tableMapper={userMistakesMapper} handleClick={() => {
+                                }}/>
+                            </> : <>Ошибок нет</>
+                        }
                     </div>
                 </div>
             }

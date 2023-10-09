@@ -20,19 +20,6 @@ const TestResults = () => {
 
     const [isModalOpen, setModal] = useState(false);
 
-    const prepareData = testData.map((el, index) => {
-        const temp = {};
-
-        for (const param in el) {
-            temp[param] = el[param]
-        }
-
-        temp.number = index + 1;
-        temp.uDate = new Date(temp.uDate).getDay() + "-" + new Date(temp.uDate).getMonth() + "-" + new Date(temp.uDate).getFullYear();
-
-        return temp;
-    })
-
     const handleClick = (id) => {
         setModal(!isModalOpen);
         dispatch(fetchUserData({id: id}))
@@ -42,32 +29,11 @@ const TestResults = () => {
         dispatch(fetchResultTable({id: selectedTestId}));
     }, [selectedTestId]);
 
-    const handleSortString = (name) => {
-
-        prepareData.sort((a, b) => {
-            const nameA = a[name];
-            const nameB = b[name];
-            if (nameA < nameB) {
-                return -1;
-            }
-            if (nameA > nameB) {
-                return 1;
-            }
-
-            return 0;
-        })
-    }
-
-    const handleSortNumbers = (name) => {
-        prepareData.sort((a, b) => a[name] - b[name]);
-    }
-
     return (
         <div className={"TestResults"}>
             {isLoading && <Loader/>}
             <TestSettingsBar/>
-            <TestTable data={prepareData} tableMapper={userTestMapper} handleClick={handleClick}
-                       onHeaderClick={handleSortString}/>
+            <TestTable data={testData} tableMapper={userTestMapper} handleClick={handleClick}/>
             <UserTestInfo isModalOpen={isModalOpen} closeModal={() => setModal(false)}/>
         </div>
     );
