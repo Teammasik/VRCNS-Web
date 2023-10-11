@@ -495,7 +495,7 @@ async function makeAnswer(item) {
 
     let counted = [0, 0, 0, 0];
 
-    attempts.forEach(item => {
+    attempts[0].forEach(item => {
         if (item.counts == 1) {
             counted[0]++
         }
@@ -516,19 +516,19 @@ async function makeAnswer(item) {
         "pointsData": {
             "data": [{
                 "name": "0-10",
-                "value": Number(PercentReq[0][0].f1)
+                "value": Math.round(Number(PercentReq[0][0].f1)/sum*100)
             },
             {
                 "name": "10-15",
-                "value": Number(PercentReq[0][0].f2)
+                "value": Math.round(Number(PercentReq[0][0].f2)/sum*100)
             },
             {
                 "name": "15-20",
-                "value": Number(PercentReq[0][0].f3)
+                "value": Math.round(Number(PercentReq[0][0].f3)/sum*100)
             },
             {
                 "name": "20-25",
-                "value": Number(PercentReq[0][0].f4)
+                "value": Math.round(Number(PercentReq[0][0].f4)/sum*100)
             }
             ]
         },
