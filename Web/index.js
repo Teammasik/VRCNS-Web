@@ -98,7 +98,7 @@ app.get('/export/:id', (req, res) => {
 
 // http://217.18.60.195:8080/sendData
 app.post('/sendData', (req, res) => {
-    pool.execute("insert into students(userName,userSurname, userGroup, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?,?)", [req.body.name, req.body.surname, req.body.group, req.body.mark, req.body.udate, req.body.points, req.body.test])
+    pool.execute("insert into students(userName,userSurname, userGroup, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?,?,?)", [req.body.name, req.body.surname, req.body.group, req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
         .then(() => {
             res.send(req.body)
             console.log("successfully sent data ")
