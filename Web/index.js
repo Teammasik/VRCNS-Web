@@ -98,7 +98,7 @@ app.get('/export/:id', (req, res) => {
 
 // http://217.18.60.195:8080/sendData
 app.post('/sendData', (req, res) => {
-    pool.execute("insert into students(userName,userSurname, userGroup, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?,?)", [req.body.name, req.body.surname, req.body.group, req.body.mark, req.body.udate, req.body.points, req.body.test])
+    pool.execute("insert into students(userName,userSurname, userGroup, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?,?,?)", [req.body.name, req.body.surname, req.body.group, req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
         .then(() => {
             res.send(req.body)
             console.log("successfully sent data ")
@@ -180,42 +180,44 @@ app.get('/fetchById/:id', async (req, res) => {
     const fetchid = req.params.id;
     let errors = await queryAll("SELECT students.id,error.content, errortype.description FROM error,students,errortype WHERE error.student_id=students.id and error.type_id = errortype.id and students.id = ?", [fetchid])
 
-    pool.execute('select id, userName, userSurname, userGroup from `students` where id=?', [fetchid])
-        .then( async result => {               //here I'm filling list with data from 'errors' variable
+    pool.execute('select id, userName, userSurname, userGroup,uTime,uDate from `students` where id=?', [fetchid])
+        .then(async result => {               //here I'm filling list with data from 'errors' variable
             try {
 
-                if (Object.keys(result[0]).length == 0){
-                    res.send(null)  
-                    throw(console.log("failed to get data, incorrect id: " + fetchid + ", pass correct id"))
+                if (Object.keys(result[0]).length == 0) {
+                    res.send(null)
+                    throw (console.log("failed to get data, incorrect id: " + fetchid + ", pass correct id"))
                 }
-                else{
+                else {
                     let list = []
                     errors[0].forEach(item => {
-                    list.push({
-                        mistakeMessage: item.description + " " + item.content
+                        list.push({
+                            mistakeMessage: item.description + " " + item.content
                         })
                     });
-                
+
                     var data = [
                         {
                             id: result[0][0].id,
                             userName: result[0][0].userName,
                             userSurname: result[0][0].userSurname,
                             userGroup: result[0][0].userGroup,
+                            uTime: result[0][0].uTime,
+                            uDate: result[0][0].uDate,
                             mistakes: list
                         }
                     ]
-        
+
                     res.send({
                         data
                     })
                     console.log("request 'fetchById' completed successfully");
                 }
-                
+
             } catch (error) {
                 //console.log(error)
             }
-            
+
         })
 });
 
@@ -281,194 +283,167 @@ app.get('/testPercentResult/:test', (req, res) => {
 });
 
 
-// the most trashy trash I've ever wrote, gonna rewrite it later
-// http://217.18.60.195:8080/allData
+// the most trashy trash I've ever wrote, gonna rewrite it later// upd: finally done it, let it be there for memories
 
-app.get('/allData', (req, res) => {
-    pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = 1')
-        .then(result => {
-            pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<16 and points>10 and test = 1')
-                .then(result1 => {
-                    pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<21 and points>15 and test = 1')
-                    .then(result2 => {
-                        pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = 1')
-                        .then(result3 => {
-                            pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = 2')
-                                .then(result4 => {
-                                    pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<16 and points>10 and test = 2')
-                                        .then(result5 => {
-                                            pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<21 and points>15 and test = 2')
-                                            .then(result6 => {
-                                                pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = 2')
-                                                .then(result7 => {
-                                                    pool.execute('SELECT COUNT(userName) as "counts", test FROM students GROUP BY userName, test')
-                                                    .then(result8 => {
-                                                        result8 = result8[0]
-                                                        // looks bad :/
-                                                        let counted = [0,0,0,0];
-                                                        let counted2 = [0,0,0,0];
-                                                        result8.forEach(item => {
-                                                            if (item.counts == 1 & item.test == 1){
-                                                                counted[0]++
-                                                            }
-                                                            if(item.counts == 2 & item.test == 1){
-                                                                counted[1]++
-                                                            }
-                                                            if(item.counts == 3 & item.test == 1){
-                                                                counted[2]++
-                                                            }
-                                                            if(item.counts > 3 & item.test == 1){
-                                                                counted[3]++
-                                                            }
-                                                            if (item.counts == 1 & item.test == 2){
-                                                                counted2[0]++
-                                                            }
-                                                            if(item.counts == 2 & item.test == 2){
-                                                                counted2[1]++
-                                                            }
-                                                            if(item.counts == 3 & item.test == 2){
-                                                                counted2[2]++
-                                                            }
-                                                            if(item.counts > 3 & item.test == 2){
-                                                                counted2[3]++
-                                                            }
+// app.get('/allData', (req, res) => {
+//     pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = 1')
+//         .then(result => {
+//             pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<16 and points>10 and test = 1')
+//                 .then(result1 => {
+//                     pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<21 and points>15 and test = 1')
+//                     .then(result2 => {
+//                         pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = 1')
+//                         .then(result3 => {
+//                             pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = 2')
+//                                 .then(result4 => {
+//                                     pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<16 and points>10 and test = 2')
+//                                         .then(result5 => {
+//                                             pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<21 and points>15 and test = 2')
+//                                             .then(result6 => {
+//                                                 pool.execute('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<26 and points>20 and test = 2')
+//                                                 .then(result7 => {
+//                                                     pool.execute('SELECT COUNT(userName) as "counts", test FROM students GROUP BY userName, test')
+//                                                     .then(result8 => {
+//                                                         result8 = result8[0]
+//                                                         // looks bad :/
+//                                                         let counted = [0,0,0,0];
+//                                                         let counted2 = [0,0,0,0];
+//                                                         result8.forEach(item => {
+//                                                             if (item.counts == 1 & item.test == 1){
+//                                                                 counted[0]++
+//                                                             }
+//                                                             if(item.counts == 2 & item.test == 1){
+//                                                                 counted[1]++
+//                                                             }
+//                                                             if(item.counts == 3 & item.test == 1){
+//                                                                 counted[2]++
+//                                                             }
+//                                                             if(item.counts > 3 & item.test == 1){
+//                                                                 counted[3]++
+//                                                             }
+//                                                             if (item.counts == 1 & item.test == 2){
+//                                                                 counted2[0]++
+//                                                             }
+//                                                             if(item.counts == 2 & item.test == 2){
+//                                                                 counted2[1]++
+//                                                             }
+//                                                             if(item.counts == 3 & item.test == 2){
+//                                                                 counted2[2]++
+//                                                             }
+//                                                             if(item.counts > 3 & item.test == 2){
+//                                                                 counted2[3]++
+//                                                             }
 
-                                                        });
+//                                                         });
 
-                                                        let summ = result[0][0].pnts + result1[0][0].pnts + result2[0][0].pnts + result3[0][0].pnts
-                                                        let summ2 = result4[0][0].pnts + result5[0][0].pnts + result6[0][0].pnts + result7[0][0].pnts
-                                                        let data = [
-                                                        {test: 1,
-                                                            name: "assembly",
-                                                            pointsData: {
-                                                                data:[
-                                                                    {
-                                                                        name: "0-10",
-                                                                        value: Math.round(result[0][0].pnts/summ*100)
-                                                                    },
-                                                                    {
-                                                                        name: "10-15",
-                                                                        value: Math.round(result1[0][0].pnts/summ*100)
-                                                                    },
-                                                                    {
-                                                                        name: "15-20",
-                                                                        value: Math.round(result2[0][0].pnts/summ*100)
-                                                                    },
-                                                                    {
-                                                                        name: "20-25",
-                                                                        value: Math.round(result3[0][0].pnts/summ*100)
-                                                                    }
-                                                                ]
+//                                                         let summ = result[0][0].pnts + result1[0][0].pnts + result2[0][0].pnts + result3[0][0].pnts
+//                                                         let summ2 = result4[0][0].pnts + result5[0][0].pnts + result6[0][0].pnts + result7[0][0].pnts
+//                                                         let data = [
+//                                                         {test: 1,
+//                                                             name: "assembly",
+//                                                             pointsData: {
+//                                                                 data:[
+//                                                                     {
+//                                                                         name: "0-10",
+//                                                                         value: Math.round(result[0][0].pnts/summ*100)
+//                                                                     },
+//                                                                     {
+//                                                                         name: "10-15",
+//                                                                         value: Math.round(result1[0][0].pnts/summ*100)
+//                                                                     },
+//                                                                     {
+//                                                                         name: "15-20",
+//                                                                         value: Math.round(result2[0][0].pnts/summ*100)
+//                                                                     },
+//                                                                     {
+//                                                                         name: "20-25",
+//                                                                         value: Math.round(result3[0][0].pnts/summ*100)
+//                                                                     }
+//                                                                 ]
 
-                                                            },
-                                                            attemptsData:{
-                                                                data:[
-                                                                    {
-                                                                        name: "с 1-й попытки",
-                                                                        value: counted[0]
-                                                                    },
-                                                                    {
-                                                                        name:"со 2-й попытки",
-                                                                        value: counted[1]
-                                                                    },
-                                                                    {
-                                                                        name:"с 3-й попытки",
-                                                                        value: counted[2]
-                                                                    },
-                                                                    {
-                                                                        name:"с 4-й попытки и более",
-                                                                        value: counted[3]
-                                                                    }
-                                                                ]
-                                                            }
-                                                            },
-                                                        {test: 2,
-                                                            name: "disassembly",
-                                                            pointsData: {
-                                                                data:[
-                                                                    {
-                                                                        name: "0-10",
-                                                                        value: Math.round(result4[0][0].pnts/summ2*100)
-                                                                    },
-                                                                    {
-                                                                        name: "10-15",
-                                                                        value: Math.round(result5[0][0].pnts/summ2*100)
-                                                                    },
-                                                                    {
-                                                                        name: "15-20",
-                                                                        value: Math.round(result6[0][0].pnts/summ2*100)
-                                                                    },
-                                                                    {
-                                                                        name: "20-25",
-                                                                        value: Math.round(result7[0][0].pnts/summ2*100)
-                                                                    }
-                                                                    ]
+//                                                             },
+//                                                             attemptsData:{
+//                                                                 data:[
+//                                                                     {
+//                                                                         name: "с 1-й попытки",
+//                                                                         value: counted[0]
+//                                                                     },
+//                                                                     {
+//                                                                         name:"со 2-й попытки",
+//                                                                         value: counted[1]
+//                                                                     },
+//                                                                     {
+//                                                                         name:"с 3-й попытки",
+//                                                                         value: counted[2]
+//                                                                     },
+//                                                                     {
+//                                                                         name:"с 4-й попытки и более",
+//                                                                         value: counted[3]
+//                                                                     }
+//                                                                 ]
+//                                                             }
+//                                                             },
+//                                                         {test: 2,
+//                                                             name: "disassembly",
+//                                                             pointsData: {
+//                                                                 data:[
+//                                                                     {
+//                                                                         name: "0-10",
+//                                                                         value: Math.round(result4[0][0].pnts/summ2*100)
+//                                                                     },
+//                                                                     {
+//                                                                         name: "10-15",
+//                                                                         value: Math.round(result5[0][0].pnts/summ2*100)
+//                                                                     },
+//                                                                     {
+//                                                                         name: "15-20",
+//                                                                         value: Math.round(result6[0][0].pnts/summ2*100)
+//                                                                     },
+//                                                                     {
+//                                                                         name: "20-25",
+//                                                                         value: Math.round(result7[0][0].pnts/summ2*100)
+//                                                                     }
+//                                                                     ]
 
-                                                                },  
-                                                                attemptsData:{
-                                                                    data:[
-                                                                        {
-                                                                            name: "с 1-й попытки",
-                                                                            value: counted2[0]
-                                                                        },
-                                                                        {
-                                                                            name:"со 2-й попытки",
-                                                                            value: counted2[1]
-                                                                        },
-                                                                        {
-                                                                            name:"с 3-й попытки",
-                                                                            value: counted2[2]
-                                                                        },
-                                                                        {
-                                                                            name:"с 4-й попытки и более",
-                                                                            value: counted2[3]
-                                                                        }
-                                                                    ]
-                                                                }
-                                                                },
-                                                    ]
-                                                    res.send({data});
-                                                    })
-
-
-                                                    console.log("request testPercentResult completed successfully");
-                                                })
-                                            })
-                                        })
-                                })   
-                        })
-                    })
-                })
-        })   
-
-});
+//                                                                 },  
+//                                                                 attemptsData:{
+//                                                                     data:[
+//                                                                         {
+//                                                                             name: "с 1-й попытки",
+//                                                                             value: counted2[0]
+//                                                                         },
+//                                                                         {
+//                                                                             name:"со 2-й попытки",
+//                                                                             value: counted2[1]
+//                                                                         },
+//                                                                         {
+//                                                                             name:"с 3-й попытки",
+//                                                                             value: counted2[2]
+//                                                                         },
+//                                                                         {
+//                                                                             name:"с 4-й попытки и более",
+//                                                                             value: counted2[3]
+//                                                                         }
+//                                                                     ]
+//                                                                 }
+//                                                                 },
+//                                                     ]
+//                                                     res.send({data});
+//                                                     })
 
 
-// app.get('/allData', async (req, res) => {
-//     let sql = 'SELECT SUM(CASE WHEN points<11 and test=? THEN 1 ELSE 0 END)f1,SUM(CASE WHEN points<16 and points>10 and test=? THEN 1 ELSE 0 END)f2,SUM(CASE WHEN points<21 and points>15 and test=? THEN 1 ELSE 0 END)f3,SUM(CASE WHEN points<26 and points>20 and test=? THEN 1 ELSE 0 END)f4 FROM students'
-//     let sql2 = 'SELECT SUM(CASE WHEN points<11 and test=1 THEN 1 ELSE 0 END)f1,SUM(CASE WHEN points<16 and points>10 and test=1 THEN 1 ELSE 0 END)f2,SUM(CASE WHEN points<21 and points>15 and test=1 THEN 1 ELSE 0 END)f3,SUM(CASE WHEN points<26 and points>20 and test=1 THEN 1 ELSE 0 END)f4 FROM students'
-//     let mass = [1,1,1,1]
-//     //console.log(await query(sql2, mass))
-//     await pool.execute('SELECT id, test FROM `tests`')
-//         .then(async quantity =>{
-//             await pool.execute('SELECT COUNT(userName) as "counts", test FROM students GROUP BY userName, test')
-//                 .then(async whatAttempt => {
-//                     await pool.execute('SELECT points, test from students')
-//                         .then(async pointsReq =>{
-//                             pointsReq = pointsReq[0]
-//                             quantity = quantity[0]
-//                             whatAttempt = whatAttempt[0]
-//                             let attTemp = []
-//                             let evert = {2: 2}
-
-//                             //console.log(query(sql2, mass))
-//                             res.send({2: 2})
-
+//                                                     console.log("request testPercentResult completed successfully");
+//                                                 })
+//                                             })
+//                                         })
+//                                 })   
 //                         })
+//                     })
 //                 })
-//         })
-//         console.log(evert)
+//         })   
+
 // });
+
 
 app.get('/errorsById/:id', (req, res) => {
     const fetchid = req.params.id;
@@ -478,7 +453,7 @@ app.get('/errorsById/:id', (req, res) => {
 
             result[0].forEach(item => {
                 data.push({
-                    errorMessage: item.description+" "+item.content
+                    errorMessage: item.description + " " + item.content
                 })
             });
             res.send({ data })
@@ -487,192 +462,101 @@ app.get('/errorsById/:id', (req, res) => {
 });
 
 
+// http://217.18.60.195:8080/allData
+// 10.10.2023 something Great happend with this water
+app.get('/allData', async (req, res) => {
 
-// someday something Great will happen with this water
-// app.get('/allData', async (req, res) => {
+    let data = []
+    let allTests = await queryAll("SELECT id, test FROM `tests`", [])
 
-//     let sql = "SELECT SUM(CASE WHEN points<11 and test = ? then 1 else 0 END)'f1', SUM(CASE WHEN points<16 and points>10 and test = ? then 1 else 0 END)'f2', SUM(CASE WHEN points<21 and points>15 and test = ? then 1 else 0 END)'f3', SUM(CASE WHEN points<26 and points>20 and test = ? then 1 else 0 END)'f4' FROM students"
-//     let sql2 = 'SELECT COUNT(userName) as "counts", test FROM students GROUP BY userName, test'
-//     let sql3 = "SELECT id, test FROM `tests`"
-//     let sql4 = "SELECT COUNT(userName) as 'counts' FROM students where test = ? GROUP BY userName"
-//     let allTests = await queryAll(sql3, [])
-//     const data = new Map()
+    // very funny cycle, apparently foreach statement can't work w/ async funcs
+    for (const item of allTests[0]) {
+        data.push(await makeAnswer(item))
+    }
 
-//     allTests[0].forEach( async item => {
-//         let temp = await queryAll(sql, [item[i].id, item[i].id, item[i].id, item[i].id])
-//         let temp2 = await queryAll(sql4, [item[i].id])
+    console.log("request allData completed")
+    res.send({data})
+});
 
-//         let counted = [0, 0, 0, 0];
-
-//         attempts.forEach(item => {
-//             if (item.counts == 1) {
-//                 counted[0]++
-//             }
-//             if (item.counts == 2) {
-//                 counted[1]++
-//             }
-//             if (item.counts == 3) {
-//                 counted[2]++
-//             }
-//             if (item.counts > 3) {
-//                 counted[3]++
-//             }
-//         });
-
-//         data.set("data", [
-//             {
-//                 "test": 1,
-//                 "name": "assembly",
-//                 pointsData: {
-//                     data: [{
-//                         "name": "0-10",
-//                         "value:": all.f1
-//                     },
-//                     {
-//                         "name": "10-15",
-//                         "value:": all.f2
-//                     },
-//                     {
-//                         "name": "15-20",
-//                         "value:": all.f3
-//                     },
-//                     {
-//                         "name": "20-25",
-//                         "value:": all.f4
-//                     }
-//                     ]
-//                 },
-//                 attemptsData: {
-//                     data: [
-//                             {
-//                                 name: "с 1-й попытки",
-//                                 value: counted[0]
-//                             },
-//                             {
-//                                 name: "со 2-й попытки",
-//                                 value: counted[1]
-//                             },
-//                             {
-//                                 name: "с 3-й попытки",
-//                                 value: counted[2]
-//                             },
-//                             {
-//                                 name: "с 4-й попытки и более",
-//                                 value: counted[3]
-//                             }
-//                     ]
-//                 }
-//             }
-//         ])
-
-//     });
-    // let all = await queryAll(sql, [1, 1, 1, 1])
-    // let all2 = await queryAll(sql, [2, 2, 2, 2])
-    // let attempts = await queryAll(sql2, [])
-    // all = all[0], all2 = all2[0], attempts = attempts[0]
-
-
-    // let counted = [0, 0, 0, 0];
-    // let counted2 = [0, 0, 0, 0];
-    // attempts.forEach(item => {
-    //     if (item.counts == 1 & item.test == 1) {
-    //         counted[0]++
-    //     }
-    //     if (item.counts == 2 & item.test == 1) {
-    //         counted[1]++
-    //     }
-    //     if (item.counts == 3 & item.test == 1) {
-    //         counted[2]++
-    //     }
-    //     if (item.counts > 3 & item.test == 1) {
-    //         counted[3]++
-    //     }
-    //     if (item.counts == 1 & item.test == 2) {
-    //         counted2[0]++
-    //     }
-    //     if (item.counts == 2 & item.test == 2) {
-    //         counted2[1]++
-    //     }
-    //     if (item.counts == 3 & item.test == 2) {
-    //         counted2[2]++
-    //     }
-    //     if (item.counts > 3 & item.test == 2) {
-    //         counted2[3]++
-    //     }
-    // });
-    // let summ = Number(all[0].f1) + Number(all[0].f2) + Number(all[0].f3) + Number(all[0].f4)
-    // const temp = new Map()
-    // temp.set(2, 32)
-    
-    
-    
-    //const data = new Map()
-//     data.set("data", [
-//         {
-//             "test": 1,
-//             "name": "assembly",
-//             pointsData: {
-//                 data: [{
-//                     "name": "0-10",
-//                     "value:": all.f1
-//                 },
-//                 {
-//                     "name": "10-15",
-//                     "value:": all.f2
-//                 },
-//                 {
-//                     "name": "15-20",
-//                     "value:": all.f3
-//                 },
-//                 {
-//                     "name": "20-25",
-//                     "value:": all.f4
-//                 }
-//                 ]
-//             },
-//             attemptsData: {
-//                 data: [
-//                         {
-//                             name: "с 1-й попытки",
-//                             value: counted[0]
-//                         },
-//                         {
-//                             name: "со 2-й попытки",
-//                             value: counted[1]
-//                         },
-//                         {
-//                             name: "с 3-й попытки",
-//                             value: counted[2]
-//                         },
-//                         {
-//                             name: "с 4-й попытки и более",
-//                             value: counted[3]
-//                         }
-//                 ]
-//             }
-//         }
-//     ])
-//     console.log("request allData completed")
-//     const jsonStr = Object.fromEntries(data)
-//     res.send(jsonStr)
-// });
-
-
-// async function query2() {
-//     const ss = await pool.query('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 and test = 1')
-//     return ss
-// }
-
-// async function query3() {
-//     const ss = await pool.query('SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<30 and test = 1')
-//     return ss
-// }
 
 async function queryAll(sql, mass) {
     //const ss = await pool.query(sql, mass)
     return await pool.query(sql, mass)
 }
 
+
+async function makeAnswer(item) {
+    let sqlPercent = "SELECT SUM(CASE WHEN points<11 and test = ? then 1 else 0 END)'f1', SUM(CASE WHEN points<16 and points>10 and test = ? then 1 else 0 END)'f2', SUM(CASE WHEN points<21 and points>15 and test = ? then 1 else 0 END)'f3', SUM(CASE WHEN points<26 and points>20 and test = ? then 1 else 0 END)'f4' FROM students"
+    let sqlAttempts = "SELECT COUNT(userName) as 'counts' FROM students where test = ? GROUP BY userName"
+
+    let PercentReq = await queryAll(sqlPercent, [item.id, item.id, item.id, item.id])
+
+    let attempts = await queryAll(sqlAttempts, [item.id])
+
+    let counted = [0, 0, 0, 0];
+
+    attempts[0].forEach(item => {
+        if (item.counts == 1) {
+            counted[0]++
+        }
+        if (item.counts == 2) {
+            counted[1]++
+        }
+        if (item.counts == 3) {
+            counted[2]++
+        }
+        if (item.counts > 3) {
+            counted[3]++
+        }
+    });
+    let sum = Number(PercentReq[0][0].f1) + Number(PercentReq[0][0].f2) + Number(PercentReq[0][0].f3) + Number(PercentReq[0][0].f4)
+    let resultData = ({
+        "test": item.id,
+        "name": item.test,
+        "pointsData": {
+            "data": [{
+                "name": "0-10",
+                "value": Math.round(Number(PercentReq[0][0].f1)/sum*100)
+            },
+            {
+                "name": "10-15",
+                "value": Math.round(Number(PercentReq[0][0].f2)/sum*100)
+            },
+            {
+                "name": "15-20",
+                "value": Math.round(Number(PercentReq[0][0].f3)/sum*100)
+            },
+            {
+                "name": "20-25",
+                "value": Math.round(Number(PercentReq[0][0].f4)/sum*100)
+            }
+            ]
+        },
+        "attemptsData": {
+            data: [
+                {
+                    name: "с 1-й попытки",
+                    value: counted[0]
+                },
+                {
+                    name: "со 2-й попытки",
+                    value: counted[1]
+                },
+                {
+                    name: "с 3-й попытки",
+                    value: counted[2]
+                },
+                {
+                    name: "с 4-й попытки и более",
+                    value: counted[3]
+                }
+            ]
+        }
+
+    })
+
+    return await resultData
+}
 
 
 // http://217.18.60.195:8080/testList
