@@ -36,7 +36,7 @@ const ChartsPage = () => {
             {
                 dataTest && dataTest.map(el => {
                     return <CollapseWindow title={el.name} id={el.name + "_id"} key={el.name + "_key"}>
-                        <PieChart width={barWidth} height={barHeight}>
+                        <PieChart width={barWidth} height={barHeight} style={{userSelect: "none"}}>
                             <Legend/>
                             <Pie nameKey={"name"} data={el.pointsData.data} dataKey={"value"} label>
                                 {
@@ -46,7 +46,7 @@ const ChartsPage = () => {
                                 }
                             </Pie>
                         </PieChart>
-                        <PieChart width={barWidth} height={barHeight}>
+                        <PieChart width={barWidth} height={barHeight} style={{userSelect: "none"}}>
                             <Legend/>
                             <Pie nameKey={"name"} data={el.attemptsData.data} dataKey={"value"} label>
                                 {

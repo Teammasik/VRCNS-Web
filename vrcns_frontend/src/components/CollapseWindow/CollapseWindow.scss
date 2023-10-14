@@ -2,6 +2,7 @@
   background: white;
   border-radius: 20px;
   margin-top: 10px;
+  user-select:none;
 
   &__header-opened {
     border-radius: 20px 20px 0 0;
@@ -16,6 +17,7 @@
 
   &__closer{
     cursor: pointer;
+    padding: 3px;
   }
 
   &__header-closed {

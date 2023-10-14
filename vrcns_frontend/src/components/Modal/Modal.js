@@ -10,10 +10,10 @@ const Modal = ({title, children, isModalOpen, closeModal}) => {
                 <div className="Modal__popup">
                     <div className="Modal__popup__header">
                         {title}
-                        <div style={{width: "20px", height: "20px", textAlign: "center"}} onClick={() => {
-                            closeModal()
-                        }}>-
+                        <div style={{justifyContent:"center", display:"flex", alignItems:"center", cursor:"pointer", padding:"3px"}} onClick={() => {closeModal()}}>
+                            <div className="Modal__close"/>
                         </div>
+
                     </div>
                     <div className="Modal__popup__body">
                         {children}

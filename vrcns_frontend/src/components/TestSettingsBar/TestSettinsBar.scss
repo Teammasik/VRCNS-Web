@@ -10,6 +10,7 @@
     align-items: center;
 
     &__button {
+      user-select:none;
       background-color: white;
       height: 30px;
       display: flex;

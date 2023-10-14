@@ -11,6 +11,7 @@
 
     &__link {
       &__active {
+        user-select:none;
         font-family: "Gill Sans", sans-serif;
         font-size: 17px;display: flex;
         align-items: center;
@@ -23,6 +24,7 @@
       }
 
       &__pending {
+        user-select:none;
         font-family: "Gill Sans", sans-serif;
         font-size: 17px;
         display: flex;

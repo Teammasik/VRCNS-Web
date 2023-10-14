@@ -1,6 +1,7 @@
 .Selector {
-
+  user-select:none;
   cursor: pointer;
+
   &__header {
     background-color: white;
     width: 220px;

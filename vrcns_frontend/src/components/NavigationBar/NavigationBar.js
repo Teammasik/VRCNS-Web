@@ -17,7 +17,8 @@ const NavigationBar = ({type}) => {
                         <div style={{
                             display: "flex", alignItems: "center",
                             justifyContent: "center", fontFamily: '"Gill Sans", sans-serif',
-                            fontSize: "17px", fontWeight: "bold"
+                            fontSize: "17px", fontWeight: "bold",
+                            userSelect:"none",
                         }}>Виртуальная лаборатория
                         </div>
                         <div className="NavigationBar__header__links">
