@@ -5,7 +5,6 @@ import "./ChartsPage.scss"
 import CollapseWindow from "../CollapseWindow/CollapseWindow";
 import {fetchStatisticData} from "../api/ChartResultSlice";
 import {pieChartMapper} from "../../constants";
-import {log10} from "chart.js/helpers";
 
 const ChartsPage = () => {
 
@@ -30,7 +29,7 @@ const ChartsPage = () => {
 
     useEffect(() => {
         dispatch(fetchStatisticData());
-    }, []);
+    }, [dispatch]);
 
     return (<div>
             {

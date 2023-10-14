@@ -1,10 +1,9 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
 import {_api_url} from "../../constants";
-import {fetchPercentResult, fetchResult, fetchResultTable, fetchTestList, testResultsSlice} from "./TestResultsSlice";
 
 export const fetchStatisticData = createAsyncThunk(
     'chartPge/statistic',
-    async (arg, thunkAPI) => {
+    async () => {
         try {
             const response = await fetch(`${_api_url}/allData`)
                 .then(response => response.json())
