@@ -14,7 +14,12 @@
     padding: 5px 15px 5px 15px;
   }
 
+  &__closer{
+    cursor: pointer;
+  }
+
   &__header-closed {
+    cursor: pointer;
     align-items: center;
     border-radius: 20px;
     background-color: #ea6424;

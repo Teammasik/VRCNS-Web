@@ -10,7 +10,7 @@ const CollapseWindow = ({title, children, id}) => {
             toggle ? <>
                 <div className="CollapseWindow__header-opened">
                     {title}
-                    <div onClick={() => setToggle(false)}>Скрыть</div>
+                    <div className="CollapseWindow__closer" onClick={() => setToggle(false)}>Скрыть</div>
                 </div>
                 <div className="CollapseWindow__body-opened">
                     {children}

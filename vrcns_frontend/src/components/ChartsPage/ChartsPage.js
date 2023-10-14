@@ -38,8 +38,7 @@ const ChartsPage = () => {
                     return <CollapseWindow title={el.name} id={el.name + "_id"} key={el.name + "_key"}>
                         <PieChart width={barWidth} height={barHeight}>
                             <Legend/>
-                            <Pie nameKey={"name"} data={el.pointsData.data} dataKey={"value"} label
-                                 animationDuration={1000}>
+                            <Pie nameKey={"name"} data={el.pointsData.data} dataKey={"value"} label>
                                 {
                                     pieChartMapper[el.pointsData.data.length].map(e => {
                                         return <Cell fill={e} key={e}/>
@@ -49,8 +48,7 @@ const ChartsPage = () => {
                         </PieChart>
                         <PieChart width={barWidth} height={barHeight}>
                             <Legend/>
-                            <Pie nameKey={"name"} data={el.attemptsData.data} dataKey={"value"} label
-                                 animationDuration={1000}>
+                            <Pie nameKey={"name"} data={el.attemptsData.data} dataKey={"value"} label>
                                 {
                                     pieChartMapper[el.attemptsData.data.length].map(e => {
                                         return <Cell fill={e} key={e}/>
