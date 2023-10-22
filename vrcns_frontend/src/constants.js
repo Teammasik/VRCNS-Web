@@ -16,12 +16,6 @@ export const userMistakesMapper = [
     {key: "mistakeMessage", name: "Ошибка"}
 ]
 
-
-export const userTestMistakesMapper = [
-    {key: "item", name: "№"},
-    {key: "errorMessage", name: "Ошибка"},
-]
-
 export const pieChartMapper = {
     3: [
         "#2DD700",
