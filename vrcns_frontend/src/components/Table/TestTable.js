@@ -14,6 +14,8 @@ const TestTable = ({data, tableMapper, handleClick}) => {
             temp[param] = el[param]
         }
 
+        temp.mark = el.mark === 1 ? "Зачёт" : "Незачёт";
+
         temp.number = index + 1;
 
         return temp;
@@ -28,9 +30,6 @@ const TestTable = ({data, tableMapper, handleClick}) => {
         if (sortedItem !== name || isClicked) {
             switch (name) {
                 case "points":
-                    extData.sort((a, b) => a[name] - b[name]);
-                    break;
-                case "mark":
                     extData.sort((a, b) => a[name] - b[name]);
                     break;
                 default:
@@ -51,9 +50,6 @@ const TestTable = ({data, tableMapper, handleClick}) => {
         } else if (sortedItem === name) {
             switch (name) {
                 case "points":
-                    extData.sort((a, b) => b[name] - a[name]);
-                    break;
-                case "mark":
                     extData.sort((a, b) => b[name] - a[name]);
                     break;
                 default:
@@ -83,7 +79,8 @@ const TestTable = ({data, tableMapper, handleClick}) => {
             tableMapper.map(el => {
                 return <th onClick={() => {
                     handleSort(el.key)
-                }} key={el.key + "_test-table-header"}>{el.name} {el.key === sortedItem ? isClicked ? "↑" : "↓" : ""}</th>
+                }}
+                           key={el.key + "_test-table-header"}>{el.name} {el.key === sortedItem ? isClicked ? "↑" : "↓" : ""}</th>
             })
         }
     </tr>

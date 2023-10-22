@@ -35,26 +35,37 @@ const ChartsPage = () => {
             {
                 dataTest && dataTest.map(el => {
                     return <CollapseWindow title={el.name} id={el.name + "_id"} key={el.name + "_key"}>
-                        <PieChart width={barWidth} height={barHeight} style={{userSelect: "none"}}>
-                            <Legend/>
-                            <Pie nameKey={"name"} data={el.pointsData.data} dataKey={"value"} label>
-                                {
-                                    pieChartMapper[el.pointsData.data.length].map(e => {
-                                        return <Cell fill={e} key={e}/>
-                                    })
-                                }
-                            </Pie>
-                        </PieChart>
-                        <PieChart width={barWidth} height={barHeight} style={{userSelect: "none"}}>
-                            <Legend/>
-                            <Pie nameKey={"name"} data={el.attemptsData.data} dataKey={"value"} label>
-                                {
-                                    pieChartMapper[el.attemptsData.data.length].map(e => {
-                                        return <Cell fill={e} key={e}/>
-                                    })
-                                }
-                            </Pie>
-                        </PieChart>
+                        <div className="ChartsPage__modal__chart">
+                            <div className="ChartsPage__modal__chart__header">
+                                Распределение результатов по баллам
+                            </div>
+                            <PieChart width={barWidth} height={barHeight} style={{userSelect: "none"}}>
+                                <Legend/>
+                                <Pie nameKey={"name"} data={el.pointsData.data} dataKey={"value"} label>
+                                    {
+                                        pieChartMapper[el.pointsData.data.length].map(e => {
+                                            return <Cell fill={e} key={e}/>
+                                        })
+                                    }
+                                </Pie>
+                            </PieChart>
+                        </div>
+                        <div className="ChartsPage__modal__chart">
+                            <div className="ChartsPage__modal__chart__header">Распределение результатов по количеству
+                                попыток
+                            </div>
+                            <PieChart width={barWidth} height={barHeight} style={{userSelect: "none"}}>
+                                <Legend/>
+                                <Pie nameKey={"name"} data={el.attemptsData.data} dataKey={"value"} label>
+                                    {
+                                        pieChartMapper[el.attemptsData.data.length].map(e => {
+                                            return <Cell fill={e} key={e}/>
+                                        })
+                                    }
+                                </Pie>
+                            </PieChart>
+                        </div>
+
                     </CollapseWindow>
                 })
             }

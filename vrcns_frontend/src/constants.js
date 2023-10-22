@@ -24,21 +24,21 @@ export const userTestMistakesMapper = [
 
 export const pieChartMapper = {
     3: [
-        "#62ee1d",
-        "#fdf109",
-        "#e71c3b",
+        "#2DD700",
+        "#FFE100",
+        "#FF0000",
     ],
     4: [
-        "#62ee1d",
-        "#e3ff00",
-        "#fd9b09",
-        "#e71c3b",
+        "#2DD700",
+        "#FFE100",
+        "#FF8700",
+        "#FF0000",
     ],
     5: [
-        "#62ee1d",
-        "#aaff00",
-        "#fdf109",
-        "#e7771c",
-        "#e71c3b",
+        "#2DD700",
+        "#A5EF00",
+        "#FFE100",
+        "#FF8700",
+        "#FF0000",
     ]
 }

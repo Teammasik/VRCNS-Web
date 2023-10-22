@@ -17,5 +17,17 @@
       display: flex;
       justify-content: space-evenly;
     }
+
+    &__chart{
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+
+      &__header{
+        text-align: center;
+        font-size: 17px;
+
+      }
+    }
   }
 }
