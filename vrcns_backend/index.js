@@ -4,8 +4,6 @@ const require = createRequire(import.meta.url); // those two rows make "require"
 
 
 import { PORT, pool } from "./connection.js"; // get_connection is a pool, if I'm not mistaken
-import { stringify } from "querystring";
-import { error } from "console";
 
 
 const express = require('express');
@@ -47,12 +45,13 @@ app.get('/export/:id', (req, res) => {
             { header: "Группа", key: "userGroup", width: 15 },
             { header: "Оценка", key: "mark", width: 15 },
             { header: "Дата", key: "uDate", width: 15 },
-            { header: "Очки", key: "points", width: 15 },
-            { header: "Тип", key: "test", width: 15 },
+            { header: "Время", key: "uTime", width: 10 },
+            { header: "Очки", key: "points", width: 5 },
+            { header: "Тип", key: "test", width: 25 },
         ]
 
 
-        pool.execute("SELECT userName, userSurname, userGroup, mark, uDate, points, tests.test FROM `students`, `tests` WHERE tests.id = students.test and students.test = ?", [fetchid])
+        pool.execute("SELECT userName, userSurname, userGroup, mark, uDate,uTime, points, tests.test FROM students,tests,walkthrough WHERE tests.id = walkthrough.test and students.id = walkthrough.student_id and walkthrough.test = ?", [fetchid])
             .then(result => {
                 result = result[0];
                 result.forEach(item => {
@@ -68,6 +67,7 @@ app.get('/export/:id', (req, res) => {
                         userGroup: item.userGroup,
                         mark: item.mark,
                         uDate: item.uDate,
+                        uTime: item.uTime,
                         points: item.points,
                         test: item.test
                     })
@@ -97,13 +97,31 @@ app.get('/export/:id', (req, res) => {
 
 
 // http://217.18.60.195:8080/sendData
-app.post('/sendData', (req, res) => {
-    pool.execute("insert into students(userName,userSurname, userGroup, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?,?,?)", [req.body.name, req.body.surname, req.body.group, req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
-        .then(() => {
-            res.send(req.body)
-            console.log("successfully sent data ")
-        })
+app.post('/sendData', async (req, res) => {
+
+    let student_id = await queryAll("SELECT id from students where userName = ? and userSurname = ? and userGroup = ?",[req.body.name, req.body.surname, req.body.group])
+    
+    if (student_id[0].length == 0) {
+        console.log("user not exists, adding data")
+
+        // adding row for students
+        await queryAll("insert into students(userName,userSurname, userGroup) VALUES (?,?,?)", [req.body.name, req.body.surname, req.body.group])
+        
+        //getting last row, redefine student_id variable to last added row, insesrting in walkthrough
+        student_id = await queryAll("SELECT id from students where userName = ? and userSurname = ? and userGroup = ?",[req.body.name, req.body.surname, req.body.group])
+        await queryAll("insert into walkthrough(student_id, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?)", [ student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
+    }
+    else{
+        console.log("user already exists, adding data")
+
+        //row in students exists, adding only row for walkthrough
+        await queryAll("insert into walkthrough(student_id, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?)", [ student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
+    }
+
+    res.send(req.body)
+    console.log("successfully sent data ")
 })
+
 
 
 // method gets everything from main table
@@ -131,12 +149,15 @@ app.get('/tshirt', (req, res) => {
 
 // http://217.18.60.195:8080/points
 app.get('/points', (req, res) => {
-    pool.execute("SELECT DISTINCT COUNT(userName) as pnts FROM `students` WHERE points<11 UNION SELECT DISTINCT COUNT(userName) FROM `students` WHERE points<16 UNION SELECT DISTINCT COUNT(userName) FROM `students` WHERE points<21 UNION SELECT DISTINCT COUNT(userName) FROM `students` WHERE points<26")
+    pool.execute("SELECT SUM(CASE WHEN points<11 THEN 1 ELSE 0 END)f1,SUM(CASE WHEN points<16 and points>10 THEN 1 ELSE 0 END)f2,SUM(CASE WHEN points<21 and points>15 THEN 1 ELSE 0 END)f3,SUM(CASE WHEN points<26 and points>20 THEN 1 ELSE 0 END)f4 FROM walkthrough")
         .then(result => {
-            result = result[0];
-            res.send({
-                result
-            })
+            let data = [{
+                10: Number(result[0][0].f1),
+                15: Number(result[0][0].f2),
+                20: Number(result[0][0].f3),
+                25: Number(result[0][0].f4)
+            }]
+            res.send({data})
             console.log("request 'points' completed successfully");
         })
 });
@@ -178,9 +199,9 @@ app.get('/points', (req, res) => {
 // http://217.18.60.195:8080/fetchbyid/1
 app.get('/fetchById/:id', async (req, res) => {
     const fetchid = req.params.id;
-    let errors = await queryAll("SELECT students.id,error.content, errortype.description FROM error,students,errortype WHERE error.student_id=students.id and error.type_id = errortype.id and students.id = ?", [fetchid])
+    let errors = await queryAll("SELECT s.id,e.content, et.description FROM error e,students s,errortype et,walkthrough w WHERE e.walkthrough_id=w.id and s.id = w.student_id and e.type_id = et.id and s.id = ?", [fetchid])
 
-    pool.execute('select id, userName, userSurname, userGroup,uTime,uDate from `students` where id=?', [fetchid])
+    pool.execute('select students.id, userName, userSurname, userGroup,uTime,uDate from students,walkthrough where students.id=? and walkthrough.student_id = students.id', [fetchid])
         .then(async result => {               //here I'm filling list with data from 'errors' variable
             try {
 
@@ -215,17 +236,17 @@ app.get('/fetchById/:id', async (req, res) => {
                 }
 
             } catch (error) {
-                //console.log(error)
             }
 
         })
 });
 
 
+
 // http://217.18.60.195:8080/testResults/1
 app.get('/testResults/:test', (req, res) => {
     const fetchid = req.params.test;
-    pool.execute("SELECT id, userName, userSurname, userGroup, mark, uTime, uDate, points FROM `students` where test = ?", [fetchid])
+    pool.execute("SELECT s.id, userName, userSurname, userGroup, w.mark, w.uTime, w.uDate, w.points FROM students s,walkthrough w where test = 1 and s.id = w.student_id", [fetchid])
         .then(data => {
             data = data[0];
 
@@ -249,15 +270,14 @@ app.get('/testResults/:test', (req, res) => {
 // http://217.18.60.195:8080/testScore/1
 app.get('/testScore/:test', (req, res) => {
     const fetchid = req.params.test;
-    pool.execute('SELECT SUM(CASE WHEN points<11 and test=? THEN 1 ELSE 0 END)f1,SUM(CASE WHEN points<16 and points>10 and test=? THEN 1 ELSE 0 END)f2,SUM(CASE WHEN points<21 and points>15 and test=? THEN 1 ELSE 0 END)f3,SUM(CASE WHEN points<26 and points>20 and test=? THEN 1 ELSE 0 END)f4 FROM students', [fetchid, fetchid, fetchid, fetchid])
+    pool.execute('SELECT SUM(CASE WHEN points<11 and test=? THEN 1 ELSE 0 END)f1,SUM(CASE WHEN points<16 and points>10 and test=? THEN 1 ELSE 0 END)f2,SUM(CASE WHEN points<21 and points>15 and test=? THEN 1 ELSE 0 END)f3,SUM(CASE WHEN points<26 and points>20 and test=? THEN 1 ELSE 0 END)f4 FROM walkthrough', [fetchid, fetchid, fetchid, fetchid])
         .then(result => {
-            result = result[0]
             let data = [{
                 test: fetchid,
-                10: Number(result[0].f1),
-                15: Number(result[0].f2),
-                20: Number(result[0].f3),
-                25: Number(result[0].f4)
+                10: Number(result[0][0].f1),
+                15: Number(result[0][0].f2),
+                20: Number(result[0][0].f3),
+                25: Number(result[0][0].f4)
             }]
             res.send({ data })
         })
@@ -267,7 +287,7 @@ app.get('/testScore/:test', (req, res) => {
 // http://217.18.60.195:8080/testPercentResult/1
 app.get('/testPercentResult/:test', (req, res) => {
     const fetchid = req.params.test;
-    pool.execute('SELECT SUM(CASE WHEN points<11 and test=? THEN 1 ELSE 0 END)f1,SUM(CASE WHEN points<16 and points>10 and test=? THEN 1 ELSE 0 END)f2,SUM(CASE WHEN points<21 and points>15 and test=? THEN 1 ELSE 0 END)f3,SUM(CASE WHEN points<26 and points>20 and test=? THEN 1 ELSE 0 END)f4 FROM students', [fetchid, fetchid, fetchid, fetchid])
+    pool.execute('SELECT SUM(CASE WHEN points<11 and test=? THEN 1 ELSE 0 END)f1,SUM(CASE WHEN points<16 and points>10 and test=? THEN 1 ELSE 0 END)f2,SUM(CASE WHEN points<21 and points>15 and test=? THEN 1 ELSE 0 END)f3,SUM(CASE WHEN points<26 and points>20 and test=? THEN 1 ELSE 0 END)f4 FROM walkthrough', [fetchid, fetchid, fetchid, fetchid])
         .then(result => {
             result = result[0]
             let summ = Number(result[0].f1) + Number(result[0].f2) + Number(result[0].f3) + Number(result[0].f4)
@@ -447,7 +467,7 @@ app.get('/testPercentResult/:test', (req, res) => {
 
 app.get('/errorsById/:id', (req, res) => {
     const fetchid = req.params.id;
-    pool.execute('SELECT students.id,error.content, errortype.description FROM error,students,errortype WHERE error.student_id=students.id and error.type_id = errortype.id and students.id = ?', [fetchid])
+    pool.execute('SELECT s.id,e.content, et.description FROM error e,students s,errortype et,walkthrough w WHERE e.walkthrough_id=w.id and s.id = w.student_id and e.type_id = et.id and s.id = ?', [fetchid])
         .then(result => {
             let data = []
 
@@ -486,8 +506,8 @@ async function queryAll(sql, mass) {
 
 
 async function makeAnswer(item) {
-    let sqlPercent = "SELECT SUM(CASE WHEN points<11 and test = ? then 1 else 0 END)'f1', SUM(CASE WHEN points<16 and points>10 and test = ? then 1 else 0 END)'f2', SUM(CASE WHEN points<21 and points>15 and test = ? then 1 else 0 END)'f3', SUM(CASE WHEN points<26 and points>20 and test = ? then 1 else 0 END)'f4' FROM students"
-    let sqlAttempts = "SELECT COUNT(userName) as 'counts' FROM students where test = ? GROUP BY userName"
+    let sqlPercent = "SELECT SUM(CASE WHEN points<11 and test = 1 then 1 else 0 END)'f1', SUM(CASE WHEN points<16 and points>10 and test = 1 then 1 else 0 END)'f2', SUM(CASE WHEN points<21 and points>15 and test = 1 then 1 else 0 END)'f3', SUM(CASE WHEN points<26 and points>20 and test = 1 then 1 else 0 END)'f4' FROM walkthrough"
+    let sqlAttempts = "SELECT COUNT(student_id) as 'counts' FROM walkthrough where test = ? GROUP BY student_id"
 
     let PercentReq = await queryAll(sqlPercent, [item.id, item.id, item.id, item.id])
 
