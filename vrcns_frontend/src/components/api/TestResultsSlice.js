@@ -50,6 +50,7 @@ export const testResultsSlice = createSlice({
         [fetchResultTable.pending]: state => {
             state.isLoading = true;
             state.error = "";
+            state.data =[];
         },
         [fetchResultTable.fulfilled]: (state, action) => {
             state.isLoading = false;

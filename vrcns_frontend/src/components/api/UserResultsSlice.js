@@ -27,6 +27,7 @@ export const UserResultsSlice = createSlice({
         [fetchUserData.pending]: state => {
             state.isLoading = true;
             state.error = "";
+            state.data = [];
         },
         [fetchUserData.fulfilled]: (state, action) => {
             state.isLoading = false;
