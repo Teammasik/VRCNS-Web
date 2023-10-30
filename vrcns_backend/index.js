@@ -107,14 +107,14 @@ app.post('/sendData', async (req, res) => {
         // adding row for students
         await queryAll("insert into students(userName,userSurname, userGroup) VALUES (?,?,?)", [req.body.name, req.body.surname, req.body.group])
         
-        //getting last row, redefine student_id variable to last added row, insesrting in walkthrough
+        //getting last row, redefine student_id variable to last added row, insesrt to walkthrough
         student_id = await queryAll("SELECT id from students where userName = ? and userSurname = ? and userGroup = ?",[req.body.name, req.body.surname, req.body.group])
         await queryAll("insert into walkthrough(student_id, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?)", [ student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
     }
     else{
         console.log("user already exists, adding data")
 
-        //row in students exists, adding only row for walkthrough
+        //if row in students exists, adding only row for walkthrough
         await queryAll("insert into walkthrough(student_id, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?)", [ student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
     }
 
@@ -199,9 +199,9 @@ app.get('/points', (req, res) => {
 // http://217.18.60.195:8080/fetchbyid/1
 app.get('/fetchById/:id', async (req, res) => {
     const fetchid = req.params.id;
-    let errors = await queryAll("SELECT s.id,e.content, et.description FROM error e,students s,errortype et,walkthrough w WHERE e.walkthrough_id=w.id and s.id = w.student_id and e.type_id = et.id and s.id = ?", [fetchid])
+    let errors = await queryAll("SELECT s.id,e.content, et.description FROM error e,students s,errortype et,walkthrough w WHERE e.walkthrough_id=w.id and s.id = w.student_id and e.type_id = et.id and w.id = ?", [fetchid])
 
-    pool.execute('select students.id, userName, userSurname, userGroup,uTime,uDate from students,walkthrough where students.id=? and walkthrough.student_id = students.id', [fetchid])
+    pool.execute('select students.id, userName, userSurname, userGroup,uTime,uDate,test from students,walkthrough where walkthrough.id=? and walkthrough.student_id = students.id', [fetchid])
         .then(async result => {               //here I'm filling list with data from 'errors' variable
             try {
 
@@ -225,6 +225,7 @@ app.get('/fetchById/:id', async (req, res) => {
                             userGroup: result[0][0].userGroup,
                             uTime: result[0][0].uTime,
                             uDate: result[0][0].uDate,
+                            test: result[0][0].test,
                             mistakes: list
                         }
                     ]
@@ -246,7 +247,7 @@ app.get('/fetchById/:id', async (req, res) => {
 // http://217.18.60.195:8080/testResults/1
 app.get('/testResults/:test', (req, res) => {
     const fetchid = req.params.test;
-    pool.execute("SELECT s.id, userName, userSurname, userGroup, w.mark, w.uTime, w.uDate, w.points FROM students s,walkthrough w where test = 1 and s.id = w.student_id", [fetchid])
+    pool.execute("SELECT s.id, userName, userSurname, userGroup, w.mark, w.uTime, w.uDate, w.points FROM students s,walkthrough w where test = ? and s.id = w.student_id", [fetchid])
         .then(data => {
             data = data[0];
 
