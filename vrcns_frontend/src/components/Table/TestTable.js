@@ -80,7 +80,7 @@ const TestTable = ({data, tableMapper, handleClick}) => {
                 return <th onClick={() => {
                     handleSort(el.key)
                 }}
-                           key={el.key + "_test-table-header"}>{el.name} {el.key === sortedItem ? isClicked ? "↑" : "↓" : ""}</th>
+                           key={`${el.key} + _test-table-header`}>{el.name}{el.key === sortedItem ? isClicked ? "↑" : "↓" : ""}</th>
             })
         }
     </tr>
@@ -92,12 +92,11 @@ const TestTable = ({data, tableMapper, handleClick}) => {
                 {
                     tableMapper.map((e) => {
                         if (e.key === "uDate") {
-                            return <td
-                                key={e.key + `_${item.name}`}>
+                            return <td key={e.key + `_${item.id}`}>
                                 {new Date(item[e.key]).getDate() + "." + (new Date(item[e.key]).getMonth() + 1) + "." + new Date(item[e.key]).getFullYear()}
                             </td>
                         } else {
-                            return <td key={e.key + `_${item.name}` + "_test-table-body"}>{item[e.key]}</td>
+                            return <td key={e.key + `_${item.id}` + "_test-table-body"}>{item[e.key]}</td>
                         }
                     })
                 }
@@ -107,12 +106,10 @@ const TestTable = ({data, tableMapper, handleClick}) => {
     </tbody>
 
     return (
-        <>
-            <table className={"table"}>
-                {tableHead}
-                {tableBody}
-            </table>
-        </>
+        <table className={"table"}>
+            {tableHead}
+            {tableBody}
+        </table>
     );
 }
 
