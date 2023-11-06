@@ -16,6 +16,8 @@ const TestTable = ({data, tableMapper, handleClick}) => {
 
         temp.mark = el.mark === 1 ? "Зачёт" : "Незачёт";
 
+        temp.uDate = new Date(el.uDate).getDate() + "." + (new Date(el.uDate).getMonth() + 1) + "." + new Date(el.uDate).getFullYear()
+
         temp.number = index + 1;
 
         return temp;
@@ -62,7 +64,6 @@ const TestTable = ({data, tableMapper, handleClick}) => {
                         if (nameA > nameB) {
                             return -1;
                         }
-
                         return 0;
                     })
             }
@@ -91,13 +92,7 @@ const TestTable = ({data, tableMapper, handleClick}) => {
             return <tr key={item.id} onClick={() => handleClick(item.id)}>
                 {
                     tableMapper.map((e) => {
-                        if (e.key === "uDate") {
-                            return <td key={e.key + `_${item.id}`}>
-                                {new Date(item[e.key]).getDate() + "." + (new Date(item[e.key]).getMonth() + 1) + "." + new Date(item[e.key]).getFullYear()}
-                            </td>
-                        } else {
-                            return <td key={e.key + `_${item.id}` + "_test-table-body"}>{item[e.key]}</td>
-                        }
+                        return <td key={e.key + `_${item.id}` + "_test-table-body"}>{item[e.key]}</td>
                     })
                 }
             </tr>
