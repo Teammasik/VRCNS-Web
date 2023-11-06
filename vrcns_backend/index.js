@@ -201,7 +201,7 @@ app.get('/fetchById/:id', async (req, res) => {
     const fetchid = req.params.id;
     let errors = await queryAll("SELECT s.id,e.content, et.description FROM error e,students s,errortype et,walkthrough w WHERE e.walkthrough_id=w.id and s.id = w.student_id and e.type_id = et.id and w.id = ?", [fetchid])
 
-    pool.execute('select students.id, userName, userSurname, userGroup,uTime,uDate,test from students,walkthrough where walkthrough.id=? and walkthrough.student_id = students.id', [fetchid])
+    pool.execute('select walkthrough.id, userName, userSurname, userGroup,uTime,uDate,test from students,walkthrough where walkthrough.id=? and walkthrough.student_id = students.id', [fetchid])
         .then(async result => {               //here I'm filling list with data from 'errors' variable
             try {
 
@@ -219,7 +219,7 @@ app.get('/fetchById/:id', async (req, res) => {
 
                     var data = [
                         {
-                            id: result[0][0].id,
+                            walkthroughId: result[0][0].id,
                             userName: result[0][0].userName,
                             userSurname: result[0][0].userSurname,
                             userGroup: result[0][0].userGroup,
@@ -493,6 +493,7 @@ app.get('/allData', async (req, res) => {
     // very funny cycle, apparently foreach statement can't work w/ async funcs
     for (const item of allTests[0]) {
         data.push(await makeAnswer(item))
+        console.log(item.id)
     }
 
     console.log("request allData completed")
@@ -507,7 +508,7 @@ async function queryAll(sql, mass) {
 
 
 async function makeAnswer(item) {
-    let sqlPercent = "SELECT SUM(CASE WHEN points<11 and test = 1 then 1 else 0 END)'f1', SUM(CASE WHEN points<16 and points>10 and test = 1 then 1 else 0 END)'f2', SUM(CASE WHEN points<21 and points>15 and test = 1 then 1 else 0 END)'f3', SUM(CASE WHEN points<26 and points>20 and test = 1 then 1 else 0 END)'f4' FROM walkthrough"
+    let sqlPercent = "SELECT SUM(CASE WHEN points<11 and test = ? then 1 else 0 END)'f1', SUM(CASE WHEN points<16 and points>10 and test = ? then 1 else 0 END)'f2', SUM(CASE WHEN points<21 and points>15 and test = ? then 1 else 0 END)'f3', SUM(CASE WHEN points<26 and points>20 and test = ? then 1 else 0 END)'f4' FROM walkthrough"
     let sqlAttempts = "SELECT COUNT(student_id) as 'counts' FROM walkthrough where test = ? GROUP BY student_id"
 
     let PercentReq = await queryAll(sqlPercent, [item.id, item.id, item.id, item.id])
