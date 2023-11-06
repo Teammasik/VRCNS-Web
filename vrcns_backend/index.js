@@ -219,7 +219,7 @@ app.get('/fetchById/:id', async (req, res) => {
 
                     var data = [
                         {
-                            walkthroughId: result[0][0].id,
+                            id: result[0][0].id,
                             userName: result[0][0].userName,
                             userSurname: result[0][0].userSurname,
                             userGroup: result[0][0].userGroup,
@@ -247,7 +247,7 @@ app.get('/fetchById/:id', async (req, res) => {
 // http://217.18.60.195:8080/testResults/1
 app.get('/testResults/:test', (req, res) => {
     const fetchid = req.params.test;
-    pool.execute("SELECT s.id, userName, userSurname, userGroup, w.mark, w.uTime, w.uDate, w.points FROM students s,walkthrough w where test = ? and s.id = w.student_id", [fetchid])
+    pool.execute("SELECT w.id, userName, userSurname, userGroup, w.mark, w.uTime, w.uDate, w.points FROM students s,walkthrough w where test = ? and s.id = w.student_id", [fetchid])
         .then(data => {
             data = data[0];
 
