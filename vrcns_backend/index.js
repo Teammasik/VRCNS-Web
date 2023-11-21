@@ -97,6 +97,31 @@ app.get('/export/:id', (req, res) => {
 
 
 // http://217.18.60.195:8080/sendData
+// app.post('/sendData', async (req, res) => {
+
+//     let student_id = await queryAll("SELECT id from students where userName = ? and userSurname = ? and userGroup = ?",[req.body.name, req.body.surname, req.body.group])
+    
+//     if (student_id[0].length == 0) {
+//         console.log("user not exists, adding data")
+
+//         // adding row for students
+//         await queryAll("insert into students(userName,userSurname, userGroup) VALUES (?,?,?)", [req.body.name, req.body.surname, req.body.group])
+        
+//         //getting last row, redefine student_id variable to last added row, insesrt to walkthrough
+//         student_id = await queryAll("SELECT id from students where userName = ? and userSurname = ? and userGroup = ?",[req.body.name, req.body.surname, req.body.group])
+//         await queryAll("insert into walkthrough(student_id, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?)", [ student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
+//     }
+//     else{
+//         console.log("user already exists, adding data")
+
+//         //if row in students exists, adding only row for walkthrough
+//         await queryAll("insert into walkthrough(student_id, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?)", [ student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
+//     }
+
+//     res.send(req.body)
+//     console.log("successfully sent data ")
+// })
+
 app.post('/sendData', async (req, res) => {
 
     let student_id = await queryAll("SELECT id from students where userName = ? and userSurname = ? and userGroup = ?",[req.body.name, req.body.surname, req.body.group])
@@ -117,6 +142,13 @@ app.post('/sendData', async (req, res) => {
         //if row in students exists, adding only row for walkthrough
         await queryAll("insert into walkthrough(student_id, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?)", [ student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
     }
+    let mis = req.body.mistakes
+    let walkId = await queryAll("select id from walkthrough where student_id=? and mark=? and uTime=? and uDate=? and points=? and test=?", [student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
+    
+    mis.forEach(item => {
+        queryAll("insert into error(content, walkthrough_id) VALUES (?,?)", [ item, walkId[0][0].id])
+    });
+    // in my directory it's a error_test table!!!
 
     res.send(req.body)
     console.log("successfully sent data ")
