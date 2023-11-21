@@ -97,31 +97,6 @@ app.get('/export/:id', (req, res) => {
 
 
 // http://217.18.60.195:8080/sendData
-// app.post('/sendData', async (req, res) => {
-
-//     let student_id = await queryAll("SELECT id from students where userName = ? and userSurname = ? and userGroup = ?",[req.body.name, req.body.surname, req.body.group])
-    
-//     if (student_id[0].length == 0) {
-//         console.log("user not exists, adding data")
-
-//         // adding row for students
-//         await queryAll("insert into students(userName,userSurname, userGroup) VALUES (?,?,?)", [req.body.name, req.body.surname, req.body.group])
-        
-//         //getting last row, redefine student_id variable to last added row, insesrt to walkthrough
-//         student_id = await queryAll("SELECT id from students where userName = ? and userSurname = ? and userGroup = ?",[req.body.name, req.body.surname, req.body.group])
-//         await queryAll("insert into walkthrough(student_id, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?)", [ student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
-//     }
-//     else{
-//         console.log("user already exists, adding data")
-
-//         //if row in students exists, adding only row for walkthrough
-//         await queryAll("insert into walkthrough(student_id, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?)", [ student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
-//     }
-
-//     res.send(req.body)
-//     console.log("successfully sent data ")
-// })
-
 app.post('/sendData', async (req, res) => {
 
     let student_id = await queryAll("SELECT id from students where userName = ? and userSurname = ? and userGroup = ?",[req.body.name, req.body.surname, req.body.group])
@@ -142,11 +117,11 @@ app.post('/sendData', async (req, res) => {
         //if row in students exists, adding only row for walkthrough
         await queryAll("insert into walkthrough(student_id, mark, uTime, uDate, points, test) VALUES (?,?,?,?,?,?)", [ student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
     }
-    let mis = req.body.mistakes
+    let mis = await JSON.parse(req.body.mistakes)
     let walkId = await queryAll("select id from walkthrough where student_id=? and mark=? and uTime=? and uDate=? and points=? and test=?", [student_id[0][0].id ,req.body.mark, req.body.utime, req.body.udate, req.body.points, req.body.test])
     
     mis.forEach(item => {
-        queryAll("insert into error(content, walkthrough_id) VALUES (?,?)", [ item, walkId[0][0].id])
+        queryAll("insert into error(content, walkthrough_id) VALUES (?,?)", [item, walkId[0][0].id])
     });
     // in my directory it's a error_test table!!!
 
@@ -231,7 +206,7 @@ app.get('/points', (req, res) => {
 // http://217.18.60.195:8080/fetchbyid/1
 app.get('/fetchById/:id', async (req, res) => {
     const fetchid = req.params.id;
-    let errors = await queryAll("SELECT s.id,e.content, et.description FROM error e,students s,errortype et,walkthrough w WHERE e.walkthrough_id=w.id and s.id = w.student_id and e.type_id = et.id and w.id = ?", [fetchid])
+    let errors = await queryAll("SELECT s.id,e.content FROM error e,students s,walkthrough w WHERE e.walkthrough_id=w.id and s.id = w.student_id and w.id = ?;", [fetchid])
 
     pool.execute('select walkthrough.id, userName, userSurname, userGroup,uTime,uDate,test from students,walkthrough where walkthrough.id=? and walkthrough.student_id = students.id', [fetchid])
         .then(async result => {               //here I'm filling list with data from 'errors' variable
@@ -245,7 +220,7 @@ app.get('/fetchById/:id', async (req, res) => {
                     let list = []
                     errors[0].forEach(item => {
                         list.push({
-                            mistakeMessage: item.description + " " + item.content
+                            mistakeMessage: item.content
                         })
                     });
 
